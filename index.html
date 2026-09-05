@@ -169,7 +169,29 @@
     }
 
 
-    chargerLabelsColonnes();
+    async function testMetadonnees() {
+  try {
+    const tables = await grist.docApi.fetchTable('_grist_Tables');
+    const colonnes = await grist.docApi.fetchTable('_grist_Tables_column');
+
+    document.getElementById('message').style.display = 'block';
+
+    document.getElementById('message').innerHTML =
+      '<b>TEST MÉTADONNÉES</b><br><br>' +
+      '<pre style="white-space:pre-wrap;font-size:12px;">' +
+      'TABLES :\n' +
+      JSON.stringify(tables, null, 2) +
+      '\n\nCOLONNES :\n' +
+      JSON.stringify(colonnes, null, 2) +
+      '</pre>';
+
+  } catch (erreur) {
+    document.getElementById('message').innerHTML =
+      '<b>ERREUR :</b><br>' + String(erreur);
+  }
+}
+
+testMetadonnees();
 
 
     grist.onRecords(async function(records, mappings) {
