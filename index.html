@@ -66,7 +66,6 @@
     th {
       background: #eee;
       font-weight: bold;
-
       position: sticky;
       top: 0;
       z-index: 2;
@@ -125,6 +124,8 @@
 
   <script>
 
+    let labelsColonnes = {};
+
     grist.ready({
       requiredAccess: 'full',
 
@@ -140,7 +141,40 @@
     });
 
 
-    grist.onRecords(function(records, mappings) {
+    async function chargerLabelsColonnes() {
+
+      try {
+
+        const meta = await grist.docApi.fetchTable('_grist_Tables_column');
+
+        labelsColonnes = {};
+
+        for (let i = 0; i < meta.id.length; i++) {
+
+          const colId = meta.colId[i];
+          const label = meta.label[i];
+
+          if (colId) {
+            labelsColonnes[colId] = label || colId;
+          }
+        }
+
+      } catch (erreur) {
+
+        console.error(
+          'Impossible de récupérer les libellés des colonnes :',
+          erreur
+        );
+      }
+    }
+
+
+    chargerLabelsColonnes();
+
+
+    grist.onRecords(async function(records, mappings) {
+
+      await chargerLabelsColonnes();
 
       const tableau = document.getElementById('tableau');
       const entetes = document.getElementById('entetes');
@@ -176,8 +210,7 @@
 
       const nombreColonnes = donnees[0].Colonnes.length;
 
-
-      const nomsColonnes =
+      const colonnesMappees =
         mappings &&
         mappings.Colonnes &&
         Array.isArray(mappings.Colonnes)
@@ -189,18 +222,21 @@
 
         const th = document.createElement('th');
 
+        const colId =
+          colonnesMappees[i] || ('Colonne ' + (i + 1));
+
         th.textContent =
-          nomsColonnes[i] || ('Colonne ' + (i + 1));
+          labelsColonnes[colId] || colId;
 
         entetes.appendChild(th);
       }
 
 
-      donnees.forEach(personne => {
+      donnees.forEach(ligne => {
 
         const tr = document.createElement('tr');
 
-        personne.Colonnes.forEach(valeur => {
+        ligne.Colonnes.forEach(valeur => {
 
           const td = document.createElement('td');
 
