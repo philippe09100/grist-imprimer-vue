@@ -131,7 +131,7 @@
       corps.innerHTML = '';
 
       const donnees = records
-        .map(record => grist.mapColumnNames(record))
+        .map(record => grist.mapColumnNames(record, { mappings }))
         .filter(Boolean);
 
 
