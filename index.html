@@ -9,7 +9,6 @@
   <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
 
   <style>
-
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
@@ -25,9 +24,9 @@
       gap: 15px;
     }
 
-    h1 {
+    #titreGeneral {
       margin: 0;
-      font-size: 24px;
+      flex: 1;
     }
 
     .boutons-haut {
@@ -84,9 +83,6 @@
       break-inside: avoid;
     }
 
-
-    /* FOND DE LA FENÊTRE */
-
     #fondConfiguration {
       display: none;
       position: fixed;
@@ -95,28 +91,20 @@
       z-index: 999;
     }
 
-
-    /* FENÊTRE DE CONFIGURATION */
-
     #configuration {
       display: none;
-
       position: fixed;
       top: 50%;
       left: 50%;
-
       transform: translate(-50%, -50%);
-
-      width: 420px;
+      width: 460px;
       max-width: calc(100% - 60px);
-
+      max-height: calc(100vh - 80px);
+      overflow-y: auto;
       background: white;
       border: 1px solid #999;
-
       padding: 20px;
-
       box-shadow: 0 5px 25px rgba(0,0,0,0.25);
-
       z-index: 1000;
     }
 
@@ -126,34 +114,53 @@
       font-size: 20px;
     }
 
-    #configuration label {
+    .champ {
+      margin-bottom: 15px;
+    }
+
+    .champ label {
       display: block;
       font-weight: bold;
       margin-bottom: 6px;
     }
 
-    #titreInput {
+    .champ input[type="text"],
+    .champ input[type="number"],
+    .champ select {
       box-sizing: border-box;
       width: 100%;
+      padding: 8px;
+      font-size: 14px;
+    }
 
-      padding: 9px;
+    .champ input[type="color"] {
+      width: 70px;
+      height: 36px;
+      padding: 2px;
+      cursor: pointer;
+    }
 
-      font-size: 15px;
+    .ligne-options {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
 
-      margin-bottom: 20px;
+    .option-cocher {
+      display: flex;
+      gap: 6px;
+      align-items: center;
     }
 
     .boutonsConfiguration {
       display: flex;
       justify-content: flex-end;
       gap: 8px;
+      margin-top: 20px;
     }
 
-
-    /* IMPRESSION */
-
     @media print {
-
       body {
         margin: 0;
       }
@@ -179,21 +186,17 @@
       th {
         position: static;
       }
-
     }
-
   </style>
 </head>
 
 <body>
-
 
   <div class="haut">
 
     <h1 id="titreGeneral">
       Liste des participants
     </h1>
-
 
     <div class="boutons-haut">
 
@@ -209,14 +212,11 @@
 
   </div>
 
-
   <div id="compteur"></div>
-
 
   <div id="message">
     Choisissez les colonnes à imprimer dans les paramètres du widget.
   </div>
-
 
   <div class="table-wrapper">
 
@@ -232,31 +232,108 @@
 
   </div>
 
-
-
   <div
     id="fondConfiguration"
     onclick="fermerConfiguration()">
   </div>
 
-
-
   <div id="configuration">
 
     <h2>
-      Modifier le titre
+      Présentation du titre
     </h2>
 
-    <label for="titreInput">
-      Titre du tableau
-    </label>
+    <div class="champ">
+      <label for="titreInput">
+        Titre du tableau
+      </label>
 
-    <input
-      id="titreInput"
-      type="text"
-      placeholder="Exemple : Liste des hospitaliers"
-    >
+      <input
+        id="titreInput"
+        type="text"
+        placeholder="Exemple : Liste des hospitaliers"
+      >
+    </div>
 
+    <div class="champ">
+      <label for="policeTitre">
+        Police
+      </label>
+
+      <select id="policeTitre">
+        <option value="Arial, sans-serif">Arial</option>
+        <option value="Verdana, sans-serif">Verdana</option>
+        <option value="Tahoma, sans-serif">Tahoma</option>
+        <option value="Trebuchet MS, sans-serif">Trebuchet MS</option>
+        <option value="Georgia, serif">Georgia</option>
+        <option value="Times New Roman, serif">Times New Roman</option>
+      </select>
+    </div>
+
+    <div class="champ">
+      <label for="tailleTitre">
+        Taille du titre
+      </label>
+
+      <input
+        id="tailleTitre"
+        type="number"
+        min="10"
+        max="60"
+        step="1"
+      >
+    </div>
+
+    <div class="champ">
+
+      <label>
+        Style
+      </label>
+
+      <div class="ligne-options">
+
+        <label class="option-cocher">
+          <input
+            id="grasTitre"
+            type="checkbox"
+          >
+          Gras
+        </label>
+
+        <label class="option-cocher">
+          <input
+            id="italiqueTitre"
+            type="checkbox"
+          >
+          Italique
+        </label>
+
+      </div>
+
+    </div>
+
+    <div class="champ">
+      <label for="couleurTitre">
+        Couleur du texte
+      </label>
+
+      <input
+        id="couleurTitre"
+        type="color"
+      >
+    </div>
+
+    <div class="champ">
+      <label for="alignementTitre">
+        Alignement
+      </label>
+
+      <select id="alignementTitre">
+        <option value="left">Gauche</option>
+        <option value="center">Centre</option>
+        <option value="right">Droite</option>
+      </select>
+    </div>
 
     <div class="boutonsConfiguration">
 
@@ -272,28 +349,89 @@
 
   </div>
 
-
-
   <script>
 
     let labelsColonnes = {};
 
-    let titreActuel =
-      'Liste des participants';
+    let optionsTitre = {
+      titre: 'Liste des participants',
+      police: 'Arial, sans-serif',
+      taille: 24,
+      gras: true,
+      italique: false,
+      couleur: '#222222',
+      alignement: 'left'
+    };
 
 
+    function appliquerStyleTitre() {
 
-    /* ============================= */
-    /* CONFIGURATION DU TITRE        */
-    /* ============================= */
+      const titre =
+        document.getElementById('titreGeneral');
+
+      titre.textContent =
+        optionsTitre.titre;
+
+      titre.style.fontFamily =
+        optionsTitre.police;
+
+      titre.style.fontSize =
+        optionsTitre.taille + 'px';
+
+      titre.style.fontWeight =
+        optionsTitre.gras
+          ? 'bold'
+          : 'normal';
+
+      titre.style.fontStyle =
+        optionsTitre.italique
+          ? 'italic'
+          : 'normal';
+
+      titre.style.color =
+        optionsTitre.couleur;
+
+      titre.style.textAlign =
+        optionsTitre.alignement;
+    }
+
 
     function ouvrirConfiguration() {
 
-      const titreInput =
-        document.getElementById('titreInput');
+      document.getElementById(
+        'titreInput'
+      ).value =
+        optionsTitre.titre;
 
-      titreInput.value =
-        titreActuel;
+      document.getElementById(
+        'policeTitre'
+      ).value =
+        optionsTitre.police;
+
+      document.getElementById(
+        'tailleTitre'
+      ).value =
+        optionsTitre.taille;
+
+      document.getElementById(
+        'grasTitre'
+      ).checked =
+        optionsTitre.gras;
+
+      document.getElementById(
+        'italiqueTitre'
+      ).checked =
+        optionsTitre.italique;
+
+      document.getElementById(
+        'couleurTitre'
+      ).value =
+        optionsTitre.couleur;
+
+      document.getElementById(
+        'alignementTitre'
+      ).value =
+        optionsTitre.alignement;
 
 
       document.getElementById(
@@ -301,19 +439,11 @@
       ).style.display =
         'block';
 
-
       document.getElementById(
         'configuration'
       ).style.display =
         'block';
-
-
-      titreInput.focus();
-
-      titreInput.select();
-
     }
-
 
 
     function fermerConfiguration() {
@@ -323,164 +453,128 @@
       ).style.display =
         'none';
 
-
       document.getElementById(
         'configuration'
       ).style.display =
         'none';
-
     }
-
 
 
     async function enregistrerConfiguration() {
 
-      const titreInput =
+      const nouveauTitre =
         document.getElementById(
           'titreInput'
-        );
+        ).value.trim();
+
+      optionsTitre = {
+
+        titre:
+          nouveauTitre ||
+          'Liste des participants',
+
+        police:
+          document.getElementById(
+            'policeTitre'
+          ).value,
+
+        taille:
+          Number(
+            document.getElementById(
+              'tailleTitre'
+            ).value
+          ) || 24,
+
+        gras:
+          document.getElementById(
+            'grasTitre'
+          ).checked,
+
+        italique:
+          document.getElementById(
+            'italiqueTitre'
+          ).checked,
+
+        couleur:
+          document.getElementById(
+            'couleurTitre'
+          ).value,
+
+        alignement:
+          document.getElementById(
+            'alignementTitre'
+          ).value
+      };
 
 
-      let nouveauTitre =
-        titreInput.value.trim();
-
-
-      if (!nouveauTitre) {
-
-        nouveauTitre =
-          'Liste des participants';
-
-      }
-
-
-      titreActuel =
-        nouveauTitre;
-
-
-      document.getElementById(
-        'titreGeneral'
-      ).textContent =
-        titreActuel;
+      appliquerStyleTitre();
 
 
       try {
 
         await grist.setOption(
-          'titre',
-          titreActuel
+          'titreOptions',
+          optionsTitre
         );
 
-      }
-
-      catch (erreur) {
+      } catch (erreur) {
 
         console.error(
-          'Impossible d’enregistrer le titre :',
+          'Impossible d’enregistrer les paramètres du titre :',
           erreur
         );
-
       }
 
 
       fermerConfiguration();
-
     }
 
-
-
-    /* ENTRÉE = ENREGISTRER */
-
-    document.getElementById(
-      'titreInput'
-    ).addEventListener(
-      'keydown',
-      function(event) {
-
-        if (event.key === 'Enter') {
-
-          enregistrerConfiguration();
-
-        }
-
-        if (event.key === 'Escape') {
-
-          fermerConfiguration();
-
-        }
-
-      }
-    );
-
-
-
-    /* ============================= */
-    /* INITIALISATION GRIST          */
-    /* ============================= */
 
     grist.ready({
 
       requiredAccess: 'full',
 
       columns: [
-
         {
-
           name: 'Colonnes',
-
           title: 'Colonnes à imprimer',
-
           type: 'Any',
-
           optional: true,
-
           allowMultiple: true
-
         }
-
       ]
 
     });
 
-
-
-    /* ============================= */
-    /* OPTIONS ENREGISTRÉES          */
-    /* ============================= */
 
     grist.onOptions(
       function(options) {
 
         if (
           options &&
+          options.titreOptions
+        ) {
+
+          optionsTitre = {
+            ...optionsTitre,
+            ...options.titreOptions
+          };
+
+        }
+
+        else if (
+          options &&
           options.titre
         ) {
 
-          titreActuel =
+          optionsTitre.titre =
             options.titre;
-
         }
 
-        else {
-
-          titreActuel =
-            'Liste des participants';
-
-        }
-
-
-        document.getElementById(
-          'titreGeneral'
-        ).textContent =
-          titreActuel;
-
+        appliquerStyleTitre();
       }
     );
 
-
-
-    /* ============================= */
-    /* NOMS VISIBLES DES COLONNES    */
-    /* ============================= */
 
     async function chargerLabelsColonnes() {
 
@@ -491,9 +585,7 @@
             '_grist_Tables_column'
           );
 
-
         labelsColonnes = {};
-
 
         for (
           let i = 0;
@@ -507,38 +599,25 @@
           const label =
             meta.label[i];
 
-
           if (colId) {
 
             labelsColonnes[colId] =
               label || colId;
-
           }
-
         }
 
-      }
-
-      catch (erreur) {
+      } catch (erreur) {
 
         console.error(
           'Impossible de récupérer les libellés :',
           erreur
         );
-
       }
-
     }
 
 
-
-    /* ============================= */
-    /* DONNÉES GRIST                 */
-    /* ============================= */
-
     grist.onRecords(
       async function(records, mappings) {
-
 
         await chargerLabelsColonnes();
 
@@ -570,9 +649,7 @@
 
 
         entetes.innerHTML = '';
-
         corps.innerHTML = '';
-
 
 
         const donnees =
@@ -586,17 +663,12 @@
             .filter(Boolean);
 
 
-
         if (
-
           donnees.length === 0 ||
-
           !donnees[0].Colonnes ||
-
           !Array.isArray(
             donnees[0].Colonnes
           )
-
         ) {
 
           tableau.style.display =
@@ -609,9 +681,7 @@
             '';
 
           return;
-
         }
-
 
 
         message.style.display =
@@ -621,28 +691,19 @@
           'table';
 
 
-
         const nombreColonnes =
           donnees[0].Colonnes.length;
 
 
         const colonnesMappees =
-
           mappings &&
-
           mappings.Colonnes &&
-
           Array.isArray(
             mappings.Colonnes
           )
-
             ? mappings.Colonnes
-
             : [];
 
-
-
-        /* ENTÊTES */
 
         for (
           let i = 0;
@@ -655,98 +716,71 @@
               'th'
             );
 
-
           const colId =
-
             colonnesMappees[i] ||
-
             (
               'Colonne ' +
               (i + 1)
             );
 
-
           th.textContent =
-
             labelsColonnes[colId] ||
-
             colId;
-
 
           entetes.appendChild(
             th
           );
-
         }
 
 
-
-        /* LIGNES */
-
         donnees.forEach(
           ligne => {
-
 
             const tr =
               document.createElement(
                 'tr'
               );
 
-
             ligne.Colonnes.forEach(
               valeur => {
-
 
                 const td =
                   document.createElement(
                     'td'
                   );
 
-
                 td.textContent =
-
                   valeur === null ||
-
                   valeur === undefined
-
                     ? ''
-
                     : valeur;
-
 
                 tr.appendChild(
                   td
                 );
-
               }
             );
-
 
             corps.appendChild(
               tr
             );
-
           }
         );
 
 
-
-        /* COMPTEUR */
-
         compteur.textContent =
-
           donnees.length +
-
           ' ligne' +
-
           (
             donnees.length > 1
               ? 's'
               : ''
           );
-
       }
     );
+
+
+    appliquerStyleTitre();
 
   </script>
 
