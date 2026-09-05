@@ -75,7 +75,6 @@
       background: #eeeeee;
       color: #222222;
       font-weight: bold;
-
       position: sticky;
       top: 0;
       z-index: 2;
@@ -100,7 +99,7 @@
       left: 50%;
       transform: translate(-50%, -50%);
 
-      width: 460px;
+      width: 480px;
       max-width: calc(100% - 60px);
       max-height: calc(100vh - 80px);
 
@@ -119,6 +118,14 @@
       margin-top: 0;
       margin-bottom: 20px;
       font-size: 20px;
+    }
+
+    #configuration h3 {
+      margin-top: 22px;
+      margin-bottom: 12px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #ddd;
+      font-size: 16px;
     }
 
     .champ {
@@ -208,7 +215,7 @@
     <div class="boutons-haut">
 
       <button onclick="ouvrirConfiguration()">
-        Titre
+        Présentation
       </button>
 
       <button onclick="window.print()">
@@ -219,14 +226,11 @@
 
   </div>
 
-
   <div id="compteur"></div>
-
 
   <div id="message">
     Choisissez les colonnes à imprimer dans les paramètres du widget.
   </div>
-
 
   <div class="table-wrapper">
 
@@ -242,18 +246,21 @@
 
   </div>
 
-
   <div
     id="fondConfiguration"
     onclick="fermerConfiguration()">
   </div>
 
-
   <div id="configuration">
 
     <h2>
-      Présentation du titre
+      Présentation du tableau
     </h2>
+
+
+    <h3>
+      Titre général
+    </h3>
 
 
     <div class="champ">
@@ -364,7 +371,7 @@
     <div class="champ">
 
       <label for="couleurTitre">
-        Couleur du texte
+        Couleur du titre
       </label>
 
       <input
@@ -400,6 +407,60 @@
     </div>
 
 
+
+    <h3>
+      En-têtes des colonnes
+    </h3>
+
+
+    <div class="champ">
+
+      <label for="tailleEntetes">
+        Taille de police
+      </label>
+
+      <input
+        id="tailleEntetes"
+        type="number"
+        min="8"
+        max="30"
+        step="1"
+      >
+
+    </div>
+
+
+    <div class="champ">
+
+      <label class="option-cocher">
+
+        <input
+          id="couleurEntetesAuto"
+          type="checkbox"
+          onchange="actualiserEtatCouleurEntetes()"
+        >
+
+        Utiliser la couleur de texte définie dans Grist
+
+      </label>
+
+    </div>
+
+
+    <div class="champ">
+
+      <label for="couleurEntetes">
+        Couleur du texte
+      </label>
+
+      <input
+        id="couleurEntetes"
+        type="color"
+      >
+
+    </div>
+
+
     <div class="boutonsConfiguration">
 
       <button onclick="fermerConfiguration()">
@@ -419,6 +480,9 @@
 
     let labelsColonnes = {};
     let stylesColonnes = {};
+
+    let derniersRecords = null;
+    let derniersMappings = null;
 
 
     let optionsTitre = {
@@ -447,10 +511,20 @@
     };
 
 
+    let optionsEntetes = {
 
-    /* ===================================================== */
-    /* TITRE                                                 */
-    /* ===================================================== */
+      taille:
+        13,
+
+      couleurAuto:
+        true,
+
+      couleur:
+        '#222222'
+
+    };
+
+
 
     function appliquerStyleTitre() {
 
@@ -459,35 +533,28 @@
           'titreGeneral'
         );
 
-
       titre.textContent =
         optionsTitre.titre;
-
 
       titre.style.fontFamily =
         optionsTitre.police;
 
-
       titre.style.fontSize =
         optionsTitre.taille +
         'px';
-
 
       titre.style.fontWeight =
         optionsTitre.gras
           ? 'bold'
           : 'normal';
 
-
       titre.style.fontStyle =
         optionsTitre.italique
           ? 'italic'
           : 'normal';
 
-
       titre.style.color =
         optionsTitre.couleur;
-
 
       titre.style.textAlign =
         optionsTitre.alignement;
@@ -541,6 +608,27 @@
 
 
       document.getElementById(
+        'tailleEntetes'
+      ).value =
+        optionsEntetes.taille;
+
+
+      document.getElementById(
+        'couleurEntetesAuto'
+      ).checked =
+        optionsEntetes.couleurAuto;
+
+
+      document.getElementById(
+        'couleurEntetes'
+      ).value =
+        optionsEntetes.couleur;
+
+
+      actualiserEtatCouleurEntetes();
+
+
+      document.getElementById(
         'fondConfiguration'
       ).style.display =
         'block';
@@ -567,6 +655,23 @@
         'configuration'
       ).style.display =
         'none';
+
+    }
+
+
+
+    function actualiserEtatCouleurEntetes() {
+
+      const automatique =
+        document.getElementById(
+          'couleurEntetesAuto'
+        ).checked;
+
+
+      document.getElementById(
+        'couleurEntetes'
+      ).disabled =
+        automatique;
 
     }
 
@@ -621,6 +726,28 @@
       };
 
 
+      optionsEntetes = {
+
+        taille:
+          Number(
+            document.getElementById(
+              'tailleEntetes'
+            ).value
+          ) || 13,
+
+        couleurAuto:
+          document.getElementById(
+            'couleurEntetesAuto'
+          ).checked,
+
+        couleur:
+          document.getElementById(
+            'couleurEntetes'
+          ).value
+
+      };
+
+
       appliquerStyleTitre();
 
 
@@ -631,12 +758,18 @@
           optionsTitre
         );
 
+
+        await grist.setOption(
+          'enteteOptions',
+          optionsEntetes
+        );
+
       }
 
       catch (erreur) {
 
         console.error(
-          'Impossible d’enregistrer les paramètres du titre :',
+          'Impossible d’enregistrer les paramètres :',
           erreur
         );
 
@@ -645,13 +778,22 @@
 
       fermerConfiguration();
 
+
+      if (
+        derniersRecords &&
+        derniersMappings
+      ) {
+
+        afficherTableau(
+          derniersRecords,
+          derniersMappings
+        );
+
+      }
+
     }
 
 
-
-    /* ===================================================== */
-    /* INITIALISATION GRIST                                  */
-    /* ===================================================== */
 
     grist.ready({
 
@@ -685,10 +827,6 @@
 
 
 
-    /* ===================================================== */
-    /* OPTIONS DU TITRE                                      */
-    /* ===================================================== */
-
     grist.onOptions(
       function(options) {
 
@@ -704,9 +842,24 @@
 
         }
 
-        else if (
+
+        if (
           options &&
-          options.titre
+          options.enteteOptions
+        ) {
+
+          optionsEntetes = {
+            ...optionsEntetes,
+            ...options.enteteOptions
+          };
+
+        }
+
+
+        if (
+          options &&
+          options.titre &&
+          !options.titreOptions
         ) {
 
           optionsTitre.titre =
@@ -721,10 +874,6 @@
     );
 
 
-
-    /* ===================================================== */
-    /* OUTILS STYLE GRIST                                    */
-    /* ===================================================== */
 
     function convertirOptions(texte) {
 
@@ -825,10 +974,6 @@
 
 
 
-    /* ===================================================== */
-    /* METADONNEES                                           */
-    /* ===================================================== */
-
     async function chargerMetadonnees(
       colonnesMappees
     ) {
@@ -857,18 +1002,8 @@
         stylesColonnes = {};
 
 
-        /*
-          ---------------------------------------------------
-          1 - Repérage des colonnes de la table source
-          ---------------------------------------------------
-        */
-
         let tableRefSource =
           null;
-
-
-        const refColonneParId =
-          {};
 
 
         for (
@@ -880,15 +1015,6 @@
           const colId =
             colonnes.colId[i];
 
-          const colRef =
-            colonnes.id[i];
-
-
-          refColonneParId[
-            colId
-          ] =
-            colRef;
-
 
           labelsColonnes[
             colId
@@ -896,13 +1022,6 @@
             colonnes.label[i] ||
             colId;
 
-
-          /*
-            On détermine la table source
-            grâce à une des colonnes
-            réellement sélectionnées
-            dans notre widget.
-          */
 
           if (
             tableRefSource === null &&
@@ -931,18 +1050,6 @@
 
 
 
-        /*
-          ---------------------------------------------------
-          2 - Repérage de la VUE BRUTE de cette table
-          ---------------------------------------------------
-
-          IMPORTANT :
-          On n'utilise plus toutes les vues du document.
-
-          Cela évite d'aller récupérer par erreur
-          le style de "fiche médicale".
-        */
-
         let sectionSource =
           null;
 
@@ -968,12 +1075,6 @@
         }
 
 
-
-        /*
-          ---------------------------------------------------
-          3 - Styles de base des colonnes
-          ---------------------------------------------------
-        */
 
         for (
           let i = 0;
@@ -1012,18 +1113,6 @@
 
 
 
-        /*
-          ---------------------------------------------------
-          4 - Style UNIQUEMENT de la section source
-          ---------------------------------------------------
-
-          Si la colonne n'a aucune couleur dans
-          participant 2026 :
-          on laisse le gris par défaut.
-
-          On ne cherche PLUS une autre vue.
-        */
-
         if (sectionSource) {
 
           const colIdParRef =
@@ -1058,10 +1147,6 @@
             i++
           ) {
 
-            /*
-              C'est LA condition importante.
-            */
-
             if (
               champsVue.parentId[i] !==
               sectionSource
@@ -1072,13 +1157,9 @@
             }
 
 
-            const colRef =
-              champsVue.colRef[i];
-
-
             const colId =
               colIdParRef[
-                colRef
+                champsVue.colRef[i]
               ];
 
 
@@ -1154,211 +1235,189 @@
 
 
 
-    /* ===================================================== */
-    /* DONNEES                                               */
-    /* ===================================================== */
+    async function afficherTableau(
+      records,
+      mappings
+    ) {
 
-    grist.onRecords(
-      async function(
-        records,
-        mappings
-      ) {
+      const colonnesMappees =
 
+        mappings &&
 
-        const colonnesMappees =
+        mappings.Colonnes &&
 
-          mappings &&
+        Array.isArray(
+          mappings.Colonnes
+        )
 
-          mappings.Colonnes &&
+          ? mappings.Colonnes
 
-          Array.isArray(
-            mappings.Colonnes
-          )
-
-            ? mappings.Colonnes
-
-            : [];
+          : [];
 
 
+      await chargerMetadonnees(
+        colonnesMappees
+      );
 
-        await chargerMetadonnees(
-          colonnesMappees
+
+      const tableau =
+        document.getElementById(
+          'tableau'
         );
 
 
+      const entetes =
+        document.getElementById(
+          'entetes'
+        );
 
-        const tableau =
-          document.getElementById(
-            'tableau'
+
+      const corps =
+        document.getElementById(
+          'corps'
+        );
+
+
+      const compteur =
+        document.getElementById(
+          'compteur'
+        );
+
+
+      const message =
+        document.getElementById(
+          'message'
+        );
+
+
+      entetes.innerHTML =
+        '';
+
+
+      corps.innerHTML =
+        '';
+
+
+      const donnees =
+
+        records
+          .map(
+            record =>
+              grist.mapColumnNames(
+                record
+              )
+          )
+          .filter(
+            Boolean
           );
 
 
-        const entetes =
-          document.getElementById(
-            'entetes'
-          );
+      if (
+
+        donnees.length === 0 ||
+
+        !donnees[0].Colonnes ||
+
+        !Array.isArray(
+          donnees[0].Colonnes
+        )
+
+      ) {
+
+        tableau.style.display =
+          'none';
 
 
-        const corps =
-          document.getElementById(
-            'corps'
-          );
+        message.style.display =
+          'block';
 
 
-        const compteur =
-          document.getElementById(
-            'compteur'
-          );
-
-
-        const message =
-          document.getElementById(
-            'message'
-          );
-
-
-
-        entetes.innerHTML =
+        compteur.textContent =
           '';
 
 
-        corps.innerHTML =
-          '';
+        return;
+
+      }
+
+
+      message.style.display =
+        'none';
+
+
+      tableau.style.display =
+        'table';
+
+
+      const nombreColonnes =
+        donnees[0].Colonnes.length;
 
 
 
-        const donnees =
+      for (
+        let i = 0;
+        i < nombreColonnes;
+        i++
+      ) {
 
-          records
-            .map(
-              record =>
-                grist.mapColumnNames(
-                  record
-                )
-            )
-            .filter(
-              Boolean
-            );
+        const th =
+          document.createElement(
+            'th'
+          );
 
+
+        const colId =
+
+          colonnesMappees[i] ||
+
+          (
+            'Colonne ' +
+            (i + 1)
+          );
+
+
+        th.textContent =
+
+          labelsColonnes[
+            colId
+          ] ||
+
+          colId;
+
+
+        th.style.backgroundColor =
+          '#eeeeee';
+
+
+        th.style.color =
+          '#222222';
+
+
+        th.style.fontSize =
+          optionsEntetes.taille +
+          'px';
+
+
+        const style =
+          stylesColonnes[
+            colId
+          ] ||
+          {};
 
 
         if (
-
-          donnees.length === 0 ||
-
-          !donnees[0].Colonnes ||
-
-          !Array.isArray(
-            donnees[0].Colonnes
-          )
-
+          style.fond
         ) {
 
-          tableau.style.display =
-            'none';
-
-
-          message.style.display =
-            'block';
-
-
-          compteur.textContent =
-            '';
-
-
-          return;
+          th.style.backgroundColor =
+            style.fond;
 
         }
 
 
-
-        message.style.display =
-          'none';
-
-
-        tableau.style.display =
-          'table';
-
-
-
-        const nombreColonnes =
-          donnees[0].Colonnes.length;
-
-
-
-        /* ================================================= */
-        /* ENTETES                                           */
-        /* ================================================= */
-
-        for (
-          let i = 0;
-          i < nombreColonnes;
-          i++
+        if (
+          optionsEntetes.couleurAuto
         ) {
-
-          const th =
-            document.createElement(
-              'th'
-            );
-
-
-          const colId =
-
-            colonnesMappees[i] ||
-
-            (
-              'Colonne ' +
-              (i + 1)
-            );
-
-
-          th.textContent =
-
-            labelsColonnes[
-              colId
-            ] ||
-
-            colId;
-
-
-
-          /*
-            Valeurs PAR DÉFAUT.
-
-            Donc si participant 2026
-            n'a pas de couleur :
-            on reste gris.
-
-            Jamais une couleur d'une autre vue.
-          */
-
-          th.style.backgroundColor =
-            '#eeeeee';
-
-
-          th.style.color =
-            '#222222';
-
-
-
-          const style =
-            stylesColonnes[
-              colId
-            ] ||
-            {};
-
-
-
-          if (
-            style.fond
-          ) {
-
-            th.style.backgroundColor =
-              style.fond;
-
-          }
-
-
 
           if (
             style.texte
@@ -1369,83 +1428,105 @@
 
           }
 
+        }
 
+        else {
 
-          entetes.appendChild(
-            th
-          );
+          th.style.color =
+            optionsEntetes.couleur;
 
         }
 
 
-
-        /* ================================================= */
-        /* LIGNES                                            */
-        /* ================================================= */
-
-        donnees.forEach(
-          ligne => {
-
-
-            const tr =
-              document.createElement(
-                'tr'
-              );
-
-
-            ligne.Colonnes.forEach(
-              valeur => {
-
-
-                const td =
-                  document.createElement(
-                    'td'
-                  );
-
-
-                td.textContent =
-
-                  valeur === null ||
-
-                  valeur === undefined
-
-                    ? ''
-
-                    : valeur;
-
-
-                tr.appendChild(
-                  td
-                );
-
-              }
-            );
-
-
-            corps.appendChild(
-              tr
-            );
-
-          }
+        entetes.appendChild(
+          th
         );
 
+      }
 
 
-        /* ================================================= */
-        /* COMPTEUR                                          */
-        /* ================================================= */
 
-        compteur.textContent =
+      donnees.forEach(
+        ligne => {
 
-          donnees.length +
 
-          ' ligne' +
+          const tr =
+            document.createElement(
+              'tr'
+            );
 
-          (
-            donnees.length > 1
-              ? 's'
-              : ''
+
+          ligne.Colonnes.forEach(
+            valeur => {
+
+
+              const td =
+                document.createElement(
+                  'td'
+                );
+
+
+              td.textContent =
+
+                valeur === null ||
+
+                valeur === undefined
+
+                  ? ''
+
+                  : valeur;
+
+
+              tr.appendChild(
+                td
+              );
+
+            }
           );
+
+
+          corps.appendChild(
+            tr
+          );
+
+        }
+      );
+
+
+      compteur.textContent =
+
+        donnees.length +
+
+        ' ligne' +
+
+        (
+          donnees.length > 1
+            ? 's'
+            : ''
+        );
+
+    }
+
+
+
+    grist.onRecords(
+      async function(
+        records,
+        mappings
+      ) {
+
+        derniersRecords =
+          records;
+
+
+        derniersMappings =
+          mappings;
+
+
+        await afficherTableau(
+          records,
+          mappings
+        );
 
       }
     );
