@@ -22,11 +22,18 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 10px;
+      gap: 15px;
     }
 
     h1 {
       margin: 0;
       font-size: 24px;
+    }
+
+    .boutons-haut {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
     }
 
     button {
@@ -68,7 +75,6 @@
     th {
       background: #eee;
       font-weight: bold;
-
       position: sticky;
       top: 0;
       z-index: 2;
@@ -79,32 +85,44 @@
     }
 
 
-    /* ------------------------------ */
-    /* FENETRE DE CONFIGURATION TITRE */
-    /* ------------------------------ */
+    /* FOND DE LA FENÊTRE */
+
+    #fondConfiguration {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.25);
+      z-index: 999;
+    }
+
+
+    /* FENÊTRE DE CONFIGURATION */
 
     #configuration {
       display: none;
 
       position: fixed;
-      top: 20px;
+      top: 50%;
       left: 50%;
-      transform: translateX(-50%);
+
+      transform: translate(-50%, -50%);
 
       width: 420px;
-      max-width: calc(100% - 40px);
+      max-width: calc(100% - 60px);
 
       background: white;
       border: 1px solid #999;
+
       padding: 20px;
 
-      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+      box-shadow: 0 5px 25px rgba(0,0,0,0.25);
 
       z-index: 1000;
     }
 
     #configuration h2 {
       margin-top: 0;
+      margin-bottom: 20px;
       font-size: 20px;
     }
 
@@ -118,11 +136,11 @@
       box-sizing: border-box;
       width: 100%;
 
-      padding: 8px;
+      padding: 9px;
 
       font-size: 15px;
 
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
 
     .boutonsConfiguration {
@@ -132,9 +150,7 @@
     }
 
 
-    /* ------------------------------ */
-    /* IMPRESSION                     */
-    /* ------------------------------ */
+    /* IMPRESSION */
 
     @media print {
 
@@ -142,11 +158,12 @@
         margin: 0;
       }
 
-      button {
+      .boutons-haut {
         display: none;
       }
 
-      #configuration {
+      #configuration,
+      #fondConfiguration {
         display: none !important;
       }
 
@@ -168,7 +185,6 @@
   </style>
 </head>
 
-
 <body>
 
 
@@ -178,9 +194,18 @@
       Liste des participants
     </h1>
 
-    <button onclick="window.print()">
-      Imprimer
-    </button>
+
+    <div class="boutons-haut">
+
+      <button onclick="ouvrirConfiguration()">
+        Titre
+      </button>
+
+      <button onclick="window.print()">
+        Imprimer
+      </button>
+
+    </div>
 
   </div>
 
@@ -209,12 +234,17 @@
 
 
 
-  <!-- CONFIGURATION DU TITRE -->
+  <div
+    id="fondConfiguration"
+    onclick="fermerConfiguration()">
+  </div>
+
+
 
   <div id="configuration">
 
     <h2>
-      Configuration du tableau
+      Modifier le titre
     </h2>
 
     <label for="titreInput">
@@ -246,34 +276,41 @@
 
   <script>
 
-    /* ===================================== */
-    /* VARIABLES                             */
-    /* ===================================== */
-
     let labelsColonnes = {};
 
-    let titreActuel = 'Liste des participants';
+    let titreActuel =
+      'Liste des participants';
 
 
 
-    /* ===================================== */
-    /* CONFIGURATION DU TITRE                */
-    /* ===================================== */
+    /* ============================= */
+    /* CONFIGURATION DU TITRE        */
+    /* ============================= */
 
     function ouvrirConfiguration() {
-
-      const configuration =
-        document.getElementById('configuration');
 
       const titreInput =
         document.getElementById('titreInput');
 
+      titreInput.value =
+        titreActuel;
 
-      titreInput.value = titreActuel;
 
-      configuration.style.display = 'block';
+      document.getElementById(
+        'fondConfiguration'
+      ).style.display =
+        'block';
+
+
+      document.getElementById(
+        'configuration'
+      ).style.display =
+        'block';
+
 
       titreInput.focus();
+
+      titreInput.select();
 
     }
 
@@ -282,8 +319,15 @@
     function fermerConfiguration() {
 
       document.getElementById(
+        'fondConfiguration'
+      ).style.display =
+        'none';
+
+
+      document.getElementById(
         'configuration'
-      ).style.display = 'none';
+      ).style.display =
+        'none';
 
     }
 
@@ -292,7 +336,9 @@
     async function enregistrerConfiguration() {
 
       const titreInput =
-        document.getElementById('titreInput');
+        document.getElementById(
+          'titreInput'
+        );
 
 
       let nouveauTitre =
@@ -307,10 +353,33 @@
       }
 
 
-      await grist.setOption(
-        'titre',
-        nouveauTitre
-      );
+      titreActuel =
+        nouveauTitre;
+
+
+      document.getElementById(
+        'titreGeneral'
+      ).textContent =
+        titreActuel;
+
+
+      try {
+
+        await grist.setOption(
+          'titre',
+          titreActuel
+        );
+
+      }
+
+      catch (erreur) {
+
+        console.error(
+          'Impossible d’enregistrer le titre :',
+          erreur
+        );
+
+      }
 
 
       fermerConfiguration();
@@ -319,9 +388,34 @@
 
 
 
-    /* ===================================== */
-    /* INITIALISATION GRIST                  */
-    /* ===================================== */
+    /* ENTRÉE = ENREGISTRER */
+
+    document.getElementById(
+      'titreInput'
+    ).addEventListener(
+      'keydown',
+      function(event) {
+
+        if (event.key === 'Enter') {
+
+          enregistrerConfiguration();
+
+        }
+
+        if (event.key === 'Escape') {
+
+          fermerConfiguration();
+
+        }
+
+      }
+    );
+
+
+
+    /* ============================= */
+    /* INITIALISATION GRIST          */
+    /* ============================= */
 
     grist.ready({
 
@@ -343,53 +437,50 @@
 
         }
 
-      ],
-
-
-      onEditOptions: function() {
-
-        ouvrirConfiguration();
-
-      }
+      ]
 
     });
 
 
 
-    /* ===================================== */
-    /* OPTIONS DU WIDGET                     */
-    /* ===================================== */
+    /* ============================= */
+    /* OPTIONS ENREGISTRÉES          */
+    /* ============================= */
 
-    grist.onOptions(function(options) {
+    grist.onOptions(
+      function(options) {
 
-      if (
-        options &&
-        options.titre
-      ) {
+        if (
+          options &&
+          options.titre
+        ) {
 
-        titreActuel =
-          options.titre;
+          titreActuel =
+            options.titre;
 
-      } else {
+        }
 
-        titreActuel =
-          'Liste des participants';
+        else {
+
+          titreActuel =
+            'Liste des participants';
+
+        }
+
+
+        document.getElementById(
+          'titreGeneral'
+        ).textContent =
+          titreActuel;
 
       }
-
-
-      document.getElementById(
-        'titreGeneral'
-      ).textContent =
-        titreActuel;
-
-    });
+    );
 
 
 
-    /* ===================================== */
-    /* LIBELLES DES COLONNES GRIST           */
-    /* ===================================== */
+    /* ============================= */
+    /* NOMS VISIBLES DES COLONNES    */
+    /* ============================= */
 
     async function chargerLabelsColonnes() {
 
@@ -441,9 +532,9 @@
 
 
 
-    /* ===================================== */
-    /* RECEPTION DES DONNEES GRIST           */
-    /* ===================================== */
+    /* ============================= */
+    /* DONNÉES GRIST                 */
+    /* ============================= */
 
     grist.onRecords(
       async function(records, mappings) {
@@ -484,10 +575,6 @@
 
 
 
-        /* ------------------------------- */
-        /* DONNEES                         */
-        /* ------------------------------- */
-
         const donnees =
           records
             .map(
@@ -499,10 +586,6 @@
             .filter(Boolean);
 
 
-
-        /* ------------------------------- */
-        /* AUCUNE COLONNE SELECTIONNEE     */
-        /* ------------------------------- */
 
         if (
 
@@ -539,10 +622,6 @@
 
 
 
-        /* ------------------------------- */
-        /* COLONNES                        */
-        /* ------------------------------- */
-
         const nombreColonnes =
           donnees[0].Colonnes.length;
 
@@ -563,9 +642,7 @@
 
 
 
-        /* ------------------------------- */
-        /* ENTETES                         */
-        /* ------------------------------- */
+        /* ENTÊTES */
 
         for (
           let i = 0;
@@ -604,9 +681,7 @@
 
 
 
-        /* ------------------------------- */
-        /* LIGNES DU TABLEAU               */
-        /* ------------------------------- */
+        /* LIGNES */
 
         donnees.forEach(
           ligne => {
@@ -656,9 +731,7 @@
 
 
 
-        /* ------------------------------- */
-        /* COMPTEUR                        */
-        /* ------------------------------- */
+        /* COMPTEUR */
 
         compteur.textContent =
 
