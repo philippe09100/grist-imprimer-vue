@@ -98,19 +98,14 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-
-      width: 480px;
+      width: 470px;
       max-width: calc(100% - 60px);
       max-height: calc(100vh - 80px);
-
       overflow-y: auto;
-
       background: white;
       border: 1px solid #999;
       padding: 20px;
-
       box-shadow: 0 5px 25px rgba(0,0,0,0.25);
-
       z-index: 1000;
     }
 
@@ -118,14 +113,6 @@
       margin-top: 0;
       margin-bottom: 20px;
       font-size: 20px;
-    }
-
-    #configuration h3 {
-      margin-top: 22px;
-      margin-bottom: 12px;
-      padding-bottom: 5px;
-      border-bottom: 1px solid #ddd;
-      font-size: 16px;
     }
 
     .champ {
@@ -172,6 +159,10 @@
       justify-content: flex-end;
       gap: 8px;
       margin-top: 20px;
+    }
+
+    .cache {
+      display: none;
     }
 
     @media print {
@@ -235,13 +226,11 @@
   <div class="table-wrapper">
 
     <table id="tableau" style="display:none;">
-
       <thead>
         <tr id="entetes"></tr>
       </thead>
 
       <tbody id="corps"></tbody>
-
     </table>
 
   </div>
@@ -257,206 +246,204 @@
       Présentation du tableau
     </h2>
 
-
-    <h3>
-      Titre général
-    </h3>
-
-
     <div class="champ">
-
-      <label for="titreInput">
-        Titre du tableau
+      <label for="elementPresentation">
+        Élément à modifier
       </label>
 
-      <input
-        id="titreInput"
-        type="text"
-        placeholder="Exemple : Liste des hospitaliers"
+      <select
+        id="elementPresentation"
+        onchange="changerElementPresentation()"
       >
-
-    </div>
-
-
-    <div class="champ">
-
-      <label for="policeTitre">
-        Police
-      </label>
-
-      <select id="policeTitre">
-
-        <option value="Arial, sans-serif">
-          Arial
+        <option value="titre">
+          Titre général
         </option>
 
-        <option value="Verdana, sans-serif">
-          Verdana
+        <option value="entetes">
+          En-tête des colonnes
         </option>
-
-        <option value="Tahoma, sans-serif">
-          Tahoma
-        </option>
-
-        <option value="Trebuchet MS, sans-serif">
-          Trebuchet MS
-        </option>
-
-        <option value="Georgia, serif">
-          Georgia
-        </option>
-
-        <option value="Times New Roman, serif">
-          Times New Roman
-        </option>
-
       </select>
-
     </div>
 
 
-    <div class="champ">
+    <!-- TITRE GENERAL -->
 
-      <label for="tailleTitre">
-        Taille du titre
-      </label>
+    <div id="blocTitre">
 
-      <input
-        id="tailleTitre"
-        type="number"
-        min="10"
-        max="60"
-        step="1"
-      >
-
-    </div>
-
-
-    <div class="champ">
-
-      <label>
-        Style
-      </label>
-
-      <div class="ligne-options">
-
-        <label class="option-cocher">
-
-          <input
-            id="grasTitre"
-            type="checkbox"
-          >
-
-          Gras
-
+      <div class="champ">
+        <label for="titreInput">
+          Texte du titre
         </label>
 
+        <input
+          id="titreInput"
+          type="text"
+          placeholder="Exemple : Liste des hospitaliers"
+        >
+      </div>
 
-        <label class="option-cocher">
-
-          <input
-            id="italiqueTitre"
-            type="checkbox"
-          >
-
-          Italique
-
+      <div class="champ">
+        <label for="policeTitre">
+          Police
         </label>
 
+        <select id="policeTitre">
+          <option value="Arial, sans-serif">Arial</option>
+          <option value="Verdana, sans-serif">Verdana</option>
+          <option value="Tahoma, sans-serif">Tahoma</option>
+          <option value="Trebuchet MS, sans-serif">Trebuchet MS</option>
+          <option value="Georgia, serif">Georgia</option>
+          <option value="Times New Roman, serif">Times New Roman</option>
+        </select>
+      </div>
+
+      <div class="champ">
+        <label for="tailleTitre">
+          Taille
+        </label>
+
+        <input
+          id="tailleTitre"
+          type="number"
+          min="10"
+          max="60"
+          step="1"
+        >
+      </div>
+
+      <div class="champ">
+        <label>
+          Style
+        </label>
+
+        <div class="ligne-options">
+
+          <label class="option-cocher">
+            <input
+              id="grasTitre"
+              type="checkbox"
+            >
+            Gras
+          </label>
+
+          <label class="option-cocher">
+            <input
+              id="italiqueTitre"
+              type="checkbox"
+            >
+            Italique
+          </label>
+
+        </div>
+      </div>
+
+      <div class="champ">
+        <label for="couleurTitre">
+          Couleur
+        </label>
+
+        <input
+          id="couleurTitre"
+          type="color"
+        >
+      </div>
+
+      <div class="champ">
+        <label for="alignementTitre">
+          Alignement
+        </label>
+
+        <select id="alignementTitre">
+          <option value="left">Gauche</option>
+          <option value="center">Centre</option>
+          <option value="right">Droite</option>
+        </select>
       </div>
 
     </div>
 
 
-    <div class="champ">
+    <!-- EN-TETES -->
 
-      <label for="couleurTitre">
-        Couleur du titre
-      </label>
+    <div id="blocEntetes" class="cache">
 
-      <input
-        id="couleurTitre"
-        type="color"
-      >
+      <div class="champ">
+        <label for="policeEntetes">
+          Police
+        </label>
 
-    </div>
+        <select id="policeEntetes">
+          <option value="Arial, sans-serif">Arial</option>
+          <option value="Verdana, sans-serif">Verdana</option>
+          <option value="Tahoma, sans-serif">Tahoma</option>
+          <option value="Trebuchet MS, sans-serif">Trebuchet MS</option>
+          <option value="Georgia, serif">Georgia</option>
+          <option value="Times New Roman, serif">Times New Roman</option>
+        </select>
+      </div>
 
-
-    <div class="champ">
-
-      <label for="alignementTitre">
-        Alignement
-      </label>
-
-      <select id="alignementTitre">
-
-        <option value="left">
-          Gauche
-        </option>
-
-        <option value="center">
-          Centre
-        </option>
-
-        <option value="right">
-          Droite
-        </option>
-
-      </select>
-
-    </div>
-
-
-
-    <h3>
-      En-têtes des colonnes
-    </h3>
-
-
-    <div class="champ">
-
-      <label for="tailleEntetes">
-        Taille de police
-      </label>
-
-      <input
-        id="tailleEntetes"
-        type="number"
-        min="8"
-        max="30"
-        step="1"
-      >
-
-    </div>
-
-
-    <div class="champ">
-
-      <label class="option-cocher">
+      <div class="champ">
+        <label for="tailleEntetes">
+          Taille
+        </label>
 
         <input
-          id="couleurEntetesAuto"
-          type="checkbox"
-          onchange="actualiserEtatCouleurEntetes()"
+          id="tailleEntetes"
+          type="number"
+          min="8"
+          max="30"
+          step="1"
         >
+      </div>
 
-        Utiliser la couleur de texte définie dans Grist
+      <div class="champ">
+        <label>
+          Style
+        </label>
 
-      </label>
+        <div class="ligne-options">
 
-    </div>
+          <label class="option-cocher">
+            <input
+              id="grasEntetes"
+              type="checkbox"
+            >
+            Gras
+          </label>
 
+          <label class="option-cocher">
+            <input
+              id="italiqueEntetes"
+              type="checkbox"
+            >
+            Italique
+          </label>
 
-    <div class="champ">
+        </div>
+      </div>
 
-      <label for="couleurEntetes">
-        Couleur du texte
-      </label>
+      <div class="champ">
+        <label for="couleurEntetes">
+          Couleur du texte
+        </label>
 
-      <input
-        id="couleurEntetes"
-        type="color"
-      >
+        <input
+          id="couleurEntetes"
+          type="color"
+        >
+      </div>
+
+      <div class="champ">
+        <label for="alignementEntetes">
+          Alignement
+        </label>
+
+        <select id="alignementEntetes">
+          <option value="left">Gauche</option>
+          <option value="center">Centre</option>
+          <option value="right">Droite</option>
+        </select>
+      </div>
 
     </div>
 
@@ -475,7 +462,6 @@
 
   </div>
 
-
   <script>
 
     let labelsColonnes = {};
@@ -486,44 +472,24 @@
 
 
     let optionsTitre = {
-
-      titre:
-        'Liste des participants',
-
-      police:
-        'Arial, sans-serif',
-
-      taille:
-        24,
-
-      gras:
-        true,
-
-      italique:
-        false,
-
-      couleur:
-        '#222222',
-
-      alignement:
-        'left'
-
+      titre: 'Liste des participants',
+      police: 'Arial, sans-serif',
+      taille: 24,
+      gras: true,
+      italique: false,
+      couleur: '#222222',
+      alignement: 'left'
     };
 
 
     let optionsEntetes = {
-
-      taille:
-        13,
-
-      couleurAuto:
-        true,
-
-      couleur:
-        '#222222'
-
+      police: 'Arial, sans-serif',
+      taille: 13,
+      gras: true,
+      italique: false,
+      couleur: '#222222',
+      alignement: 'left'
     };
-
 
 
     function appliquerStyleTitre() {
@@ -540,8 +506,7 @@
         optionsTitre.police;
 
       titre.style.fontSize =
-        optionsTitre.taille +
-        'px';
+        optionsTitre.taille + 'px';
 
       titre.style.fontWeight =
         optionsTitre.gras
@@ -558,9 +523,7 @@
 
       titre.style.textAlign =
         optionsTitre.alignement;
-
     }
-
 
 
     function ouvrirConfiguration() {
@@ -570,36 +533,30 @@
       ).value =
         optionsTitre.titre;
 
-
       document.getElementById(
         'policeTitre'
       ).value =
         optionsTitre.police;
-
 
       document.getElementById(
         'tailleTitre'
       ).value =
         optionsTitre.taille;
 
-
       document.getElementById(
         'grasTitre'
       ).checked =
         optionsTitre.gras;
-
 
       document.getElementById(
         'italiqueTitre'
       ).checked =
         optionsTitre.italique;
 
-
       document.getElementById(
         'couleurTitre'
       ).value =
         optionsTitre.couleur;
-
 
       document.getElementById(
         'alignementTitre'
@@ -608,24 +565,37 @@
 
 
       document.getElementById(
+        'policeEntetes'
+      ).value =
+        optionsEntetes.police;
+
+      document.getElementById(
         'tailleEntetes'
       ).value =
         optionsEntetes.taille;
 
+      document.getElementById(
+        'grasEntetes'
+      ).checked =
+        optionsEntetes.gras;
 
       document.getElementById(
-        'couleurEntetesAuto'
+        'italiqueEntetes'
       ).checked =
-        optionsEntetes.couleurAuto;
-
+        optionsEntetes.italique;
 
       document.getElementById(
         'couleurEntetes'
       ).value =
         optionsEntetes.couleur;
 
+      document.getElementById(
+        'alignementEntetes'
+      ).value =
+        optionsEntetes.alignement;
 
-      actualiserEtatCouleurEntetes();
+
+      changerElementPresentation();
 
 
       document.getElementById(
@@ -633,14 +603,11 @@
       ).style.display =
         'block';
 
-
       document.getElementById(
         'configuration'
       ).style.display =
         'block';
-
     }
-
 
 
     function fermerConfiguration() {
@@ -650,46 +617,63 @@
       ).style.display =
         'none';
 
-
       document.getElementById(
         'configuration'
       ).style.display =
         'none';
-
     }
 
 
+    function changerElementPresentation() {
 
-    function actualiserEtatCouleurEntetes() {
-
-      const automatique =
+      const choix =
         document.getElementById(
-          'couleurEntetesAuto'
-        ).checked;
+          'elementPresentation'
+        ).value;
+
+      const blocTitre =
+        document.getElementById(
+          'blocTitre'
+        );
+
+      const blocEntetes =
+        document.getElementById(
+          'blocEntetes'
+        );
 
 
-      document.getElementById(
-        'couleurEntetes'
-      ).disabled =
-        automatique;
+      if (choix === 'titre') {
 
+        blocTitre.classList.remove(
+          'cache'
+        );
+
+        blocEntetes.classList.add(
+          'cache'
+        );
+
+      } else {
+
+        blocTitre.classList.add(
+          'cache'
+        );
+
+        blocEntetes.classList.remove(
+          'cache'
+        );
+      }
     }
-
 
 
     async function enregistrerConfiguration() {
 
-      const nouveauTitre =
-        document.getElementById(
-          'titreInput'
-        ).value.trim();
-
-
       optionsTitre = {
 
         titre:
-          nouveauTitre ||
-          'Liste des participants',
+          document.getElementById(
+            'titreInput'
+          ).value.trim()
+          || 'Liste des participants',
 
         police:
           document.getElementById(
@@ -722,11 +706,15 @@
           document.getElementById(
             'alignementTitre'
           ).value
-
       };
 
 
       optionsEntetes = {
+
+        police:
+          document.getElementById(
+            'policeEntetes'
+          ).value,
 
         taille:
           Number(
@@ -735,16 +723,25 @@
             ).value
           ) || 13,
 
-        couleurAuto:
+        gras:
           document.getElementById(
-            'couleurEntetesAuto'
+            'grasEntetes'
+          ).checked,
+
+        italique:
+          document.getElementById(
+            'italiqueEntetes'
           ).checked,
 
         couleur:
           document.getElementById(
             'couleurEntetes'
-          ).value
+          ).value,
 
+        alignement:
+          document.getElementById(
+            'alignementEntetes'
+          ).value
       };
 
 
@@ -758,21 +755,17 @@
           optionsTitre
         );
 
-
         await grist.setOption(
           'enteteOptions',
           optionsEntetes
         );
 
-      }
-
-      catch (erreur) {
+      } catch (erreur) {
 
         console.error(
           'Impossible d’enregistrer les paramètres :',
           erreur
         );
-
       }
 
 
@@ -788,43 +781,25 @@
           derniersRecords,
           derniersMappings
         );
-
       }
-
     }
-
 
 
     grist.ready({
 
-      requiredAccess:
-        'full',
+      requiredAccess: 'full',
 
       columns: [
-
         {
-
-          name:
-            'Colonnes',
-
-          title:
-            'Colonnes à imprimer',
-
-          type:
-            'Any',
-
-          optional:
-            true,
-
-          allowMultiple:
-            true
-
+          name: 'Colonnes',
+          title: 'Colonnes à imprimer',
+          type: 'Any',
+          optional: true,
+          allowMultiple: true
         }
-
       ]
 
     });
-
 
 
     grist.onOptions(
@@ -839,7 +814,6 @@
             ...optionsTitre,
             ...options.titreOptions
           };
-
         }
 
 
@@ -852,7 +826,6 @@
             ...optionsEntetes,
             ...options.enteteOptions
           };
-
         }
 
 
@@ -864,15 +837,12 @@
 
           optionsTitre.titre =
             options.titre;
-
         }
 
 
         appliquerStyleTitre();
-
       }
     );
-
 
 
     function convertirOptions(texte) {
@@ -881,97 +851,47 @@
         return {};
       }
 
-
       if (
-        typeof texte ===
-        'object'
+        typeof texte === 'object'
       ) {
-
         return texte;
-
       }
 
-
       try {
-
         return JSON.parse(
           texte
         );
-
       }
 
       catch (erreur) {
-
         return {};
-
       }
-
     }
-
 
 
     function trouverCouleurFond(options) {
 
       return (
-
         options.fillColor ||
-
         options.backgroundColor ||
-
         options.bgColor ||
-
         options.cellBackgroundColor ||
-
         options.headerFillColor ||
-
         options.headerBackgroundColor ||
-
         null
-
       );
-
     }
-
-
-
-    function trouverCouleurTexte(options) {
-
-      return (
-
-        options.textColor ||
-
-        options.color ||
-
-        options.fontColor ||
-
-        options.headerTextColor ||
-
-        null
-
-      );
-
-    }
-
 
 
     function creerStyleDepuisOptions(options) {
 
       return {
-
         fond:
           trouverCouleurFond(
             options
-          ),
-
-        texte:
-          trouverCouleurTexte(
-            options
           )
-
       };
-
     }
-
 
 
     async function chargerMetadonnees(
@@ -985,12 +905,10 @@
             '_grist_Tables'
           );
 
-
         const colonnes =
           await grist.docApi.fetchTable(
             '_grist_Tables_column'
           );
-
 
         const champsVue =
           await grist.docApi.fetchTable(
@@ -1016,9 +934,7 @@
             colonnes.colId[i];
 
 
-          labelsColonnes[
-            colId
-          ] =
+          labelsColonnes[colId] =
             colonnes.label[i] ||
             colId;
 
@@ -1032,22 +948,15 @@
 
             tableRefSource =
               colonnes.parentId[i];
-
           }
-
         }
-
 
 
         if (
-          tableRefSource ===
-          null
+          tableRefSource === null
         ) {
-
           return;
-
         }
-
 
 
         let sectionSource =
@@ -1069,11 +978,8 @@
               tables.rawViewSectionRef[i];
 
             break;
-
           }
-
         }
-
 
 
         for (
@@ -1086,9 +992,7 @@
             colonnes.parentId[i] !==
             tableRefSource
           ) {
-
             continue;
-
           }
 
 
@@ -1102,15 +1006,11 @@
             );
 
 
-          stylesColonnes[
-            colId
-          ] =
+          stylesColonnes[colId] =
             creerStyleDepuisOptions(
               options
             );
-
         }
-
 
 
         if (sectionSource) {
@@ -1134,11 +1034,8 @@
                 colonnes.id[i]
               ] =
                 colonnes.colId[i];
-
             }
-
           }
-
 
 
           for (
@@ -1151,9 +1048,7 @@
               champsVue.parentId[i] !==
               sectionSource
             ) {
-
               continue;
-
             }
 
 
@@ -1181,15 +1076,11 @@
 
 
             if (
-              !stylesColonnes[
-                colId
-              ]
+              !stylesColonnes[colId]
             ) {
 
-              stylesColonnes[
-                colId
-              ] = {};
-
+              stylesColonnes[colId] =
+                {};
             }
 
 
@@ -1201,23 +1092,8 @@
                 colId
               ].fond =
                 styleVue.fond;
-
             }
-
-
-            if (
-              styleVue.texte
-            ) {
-
-              stylesColonnes[
-                colId
-              ].texte =
-                styleVue.texte;
-
-            }
-
           }
-
         }
 
       }
@@ -1228,11 +1104,8 @@
           'Impossible de récupérer les styles Grist :',
           erreur
         );
-
       }
-
     }
-
 
 
     async function afficherTableau(
@@ -1241,17 +1114,12 @@
     ) {
 
       const colonnesMappees =
-
         mappings &&
-
         mappings.Colonnes &&
-
         Array.isArray(
           mappings.Colonnes
         )
-
           ? mappings.Colonnes
-
           : [];
 
 
@@ -1265,24 +1133,20 @@
           'tableau'
         );
 
-
       const entetes =
         document.getElementById(
           'entetes'
         );
-
 
       const corps =
         document.getElementById(
           'corps'
         );
 
-
       const compteur =
         document.getElementById(
           'compteur'
         );
-
 
       const message =
         document.getElementById(
@@ -1290,16 +1154,11 @@
         );
 
 
-      entetes.innerHTML =
-        '';
-
-
-      corps.innerHTML =
-        '';
+      entetes.innerHTML = '';
+      corps.innerHTML = '';
 
 
       const donnees =
-
         records
           .map(
             record =>
@@ -1307,43 +1166,32 @@
                 record
               )
           )
-          .filter(
-            Boolean
-          );
+          .filter(Boolean);
 
 
       if (
-
         donnees.length === 0 ||
-
         !donnees[0].Colonnes ||
-
         !Array.isArray(
           donnees[0].Colonnes
         )
-
       ) {
 
         tableau.style.display =
           'none';
 
-
         message.style.display =
           'block';
-
 
         compteur.textContent =
           '';
 
-
         return;
-
       }
 
 
       message.style.display =
         'none';
-
 
       tableau.style.display =
         'table';
@@ -1351,7 +1199,6 @@
 
       const nombreColonnes =
         donnees[0].Colonnes.length;
-
 
 
       for (
@@ -1367,9 +1214,7 @@
 
 
         const colId =
-
           colonnesMappees[i] ||
-
           (
             'Colonne ' +
             (i + 1)
@@ -1377,11 +1222,7 @@
 
 
         th.textContent =
-
-          labelsColonnes[
-            colId
-          ] ||
-
+          labelsColonnes[colId] ||
           colId;
 
 
@@ -1389,124 +1230,92 @@
           '#eeeeee';
 
 
-        th.style.color =
-          '#222222';
+        const style =
+          stylesColonnes[colId] ||
+          {};
 
+
+        if (style.fond) {
+
+          th.style.backgroundColor =
+            style.fond;
+        }
+
+
+        th.style.fontFamily =
+          optionsEntetes.police;
 
         th.style.fontSize =
           optionsEntetes.taille +
           'px';
 
+        th.style.fontWeight =
+          optionsEntetes.gras
+            ? 'bold'
+            : 'normal';
 
-        const style =
-          stylesColonnes[
-            colId
-          ] ||
-          {};
+        th.style.fontStyle =
+          optionsEntetes.italique
+            ? 'italic'
+            : 'normal';
 
+        th.style.color =
+          optionsEntetes.couleur;
 
-        if (
-          style.fond
-        ) {
-
-          th.style.backgroundColor =
-            style.fond;
-
-        }
-
-
-        if (
-          optionsEntetes.couleurAuto
-        ) {
-
-          if (
-            style.texte
-          ) {
-
-            th.style.color =
-              style.texte;
-
-          }
-
-        }
-
-        else {
-
-          th.style.color =
-            optionsEntetes.couleur;
-
-        }
+        th.style.textAlign =
+          optionsEntetes.alignement;
 
 
         entetes.appendChild(
           th
         );
-
       }
-
 
 
       donnees.forEach(
         ligne => {
-
 
           const tr =
             document.createElement(
               'tr'
             );
 
-
           ligne.Colonnes.forEach(
             valeur => {
-
 
               const td =
                 document.createElement(
                   'td'
                 );
 
-
               td.textContent =
-
                 valeur === null ||
-
                 valeur === undefined
-
                   ? ''
-
                   : valeur;
-
 
               tr.appendChild(
                 td
               );
-
             }
           );
-
 
           corps.appendChild(
             tr
           );
-
         }
       );
 
 
       compteur.textContent =
-
         donnees.length +
-
         ' ligne' +
-
         (
           donnees.length > 1
             ? 's'
             : ''
         );
-
     }
-
 
 
     grist.onRecords(
@@ -1518,7 +1327,6 @@
         derniersRecords =
           records;
 
-
         derniersMappings =
           mappings;
 
@@ -1527,10 +1335,8 @@
           records,
           mappings
         );
-
       }
     );
-
 
 
     appliquerStyleTitre();
