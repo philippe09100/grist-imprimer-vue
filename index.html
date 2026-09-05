@@ -20,7 +20,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
     }
 
     h1 {
@@ -34,7 +34,7 @@
     }
 
     #compteur {
-      margin-bottom: 15px;
+      margin-bottom: 12px;
       color: #666;
     }
 
@@ -44,21 +44,32 @@
       border: 1px solid #ccc;
     }
 
+    .table-wrapper {
+      width: 100%;
+      overflow: auto;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
       font-size: 13px;
     }
 
-    th, td {
+    th,
+    td {
       border: 1px solid #999;
       padding: 6px 8px;
       text-align: left;
+      vertical-align: top;
     }
 
     th {
       background: #eee;
       font-weight: bold;
+
+      position: sticky;
+      top: 0;
+      z-index: 2;
     }
 
     tr {
@@ -74,8 +85,16 @@
         display: none;
       }
 
+      .table-wrapper {
+        overflow: visible;
+      }
+
       table {
         font-size: 11px;
+      }
+
+      th {
+        position: static;
       }
     }
   </style>
@@ -94,13 +113,15 @@
     Choisissez les colonnes à imprimer dans les paramètres du widget.
   </div>
 
-  <table id="tableau" style="display:none;">
-    <thead>
-      <tr id="entetes"></tr>
-    </thead>
+  <div class="table-wrapper">
+    <table id="tableau" style="display:none;">
+      <thead>
+        <tr id="entetes"></tr>
+      </thead>
 
-    <tbody id="corps"></tbody>
-  </table>
+      <tbody id="corps"></tbody>
+    </table>
+  </div>
 
   <script>
 
@@ -131,7 +152,7 @@
       corps.innerHTML = '';
 
       const donnees = records
-        .map(record => grist.mapColumnNames(record, { mappings }))
+        .map(record => grist.mapColumnNames(record))
         .filter(Boolean);
 
 
@@ -153,23 +174,26 @@
       tableau.style.display = 'table';
 
 
+      const nombreColonnes = donnees[0].Colonnes.length;
+
+
       const nomsColonnes =
-  mappings &&
-  mappings.Colonnes &&
-  Array.isArray(mappings.Colonnes)
-    ? mappings.Colonnes
-    : [];
+        mappings &&
+        mappings.Colonnes &&
+        Array.isArray(mappings.Colonnes)
+          ? mappings.Colonnes
+          : [];
 
 
-for (let i = 0; i < nombreColonnes; i++) {
+      for (let i = 0; i < nombreColonnes; i++) {
 
-  const th = document.createElement('th');
+        const th = document.createElement('th');
 
-  th.textContent =
-    nomsColonnes[i] || ('Colonne ' + (i + 1));
+        th.textContent =
+          nomsColonnes[i] || ('Colonne ' + (i + 1));
 
-  entetes.appendChild(th);
-}
+        entetes.appendChild(th);
+      }
 
 
       donnees.forEach(personne => {
@@ -194,7 +218,7 @@ for (let i = 0; i < nombreColonnes; i++) {
 
       compteur.textContent =
         donnees.length +
-        ' personne' +
+        ' ligne' +
         (donnees.length > 1 ? 's' : '');
 
     });
