@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Imprimer la vue ++</title>
+
+  <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: white;
+      color: #222;
+    }
+
+    .haut {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    button {
+      padding: 8px 15px;
+      cursor: pointer;
+    }
+
+    #compteur {
+      margin-bottom: 15px;
+      color: #666;
+    }
+
+    #message {
+      padding: 15px;
+      background: #f5f5f5;
+      border: 1px solid #ccc;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      border: 1px solid #999;
+      padding: 6px 8px;
+      text-align: left;
+    }
+
+    th {
+      background: #eee;
+      font-weight: bold;
+    }
+
+    tr {
+      break-inside: avoid;
+    }
+
+    @media print {
+      body {
+        margin: 0;
+      }
+
+      button {
+        display: none;
+      }
+
+      table {
+        font-size: 11px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="haut">
+    <h1>Liste des participants</h1>
+    <button onclick="window.print()">Imprimer</button>
+  </div>
+
+  <div id="compteur"></div>
+
+  <div id="message">
+    Choisissez les colonnes à imprimer dans les paramètres du widget.
+  </div>
+
+  <table id="tableau" style="display:none;">
+    <thead>
+      <tr id="entetes"></tr>
+    </thead>
+
+    <tbody id="corps"></tbody>
+  </table>
+
+  <script>
+
+    grist.ready({
+      requiredAccess: 'read table',
+
+      columns: [
+        {
+          name: 'Colonnes',
+          title: 'Colonnes à imprimer',
+          type: 'Any',
+          optional: true,
+          allowMultiple: true
+        }
+      ]
+    });
+
+
+    grist.onRecords(function(records) {
+
+      const tableau = document.getElementById('tableau');
+      const entetes = document.getElementById('entetes');
+      const corps = document.getElementById('corps');
+      const compteur = document.getElementById('compteur');
+      const message = document.getElementById('message');
+
+      entetes.innerHTML = '';
+      corps.innerHTML = '';
+
+      const donnees = records
+        .map(record => grist.mapColumnNames(record))
+        .filter(Boolean);
+
+
+      if (
+        donnees.length === 0 ||
+        !donnees[0].Colonnes ||
+        !Array.isArray(donnees[0].Colonnes)
+      ) {
+
+        tableau.style.display = 'none';
+        message.style.display = 'block';
+        compteur.textContent = '';
+
+        return;
+      }
+
+
+      message.style.display = 'none';
+      tableau.style.display = 'table';
+
+
+      const nombreColonnes = donnees[0].Colonnes.length;
+
+
+      for (let i = 0; i < nombreColonnes; i++) {
+
+        const th = document.createElement('th');
+
+        th.textContent = 'Colonne ' + (i + 1);
+
+        entetes.appendChild(th);
+      }
+
+
+      donnees.forEach(personne => {
+
+        const tr = document.createElement('tr');
+
+        personne.Colonnes.forEach(valeur => {
+
+          const td = document.createElement('td');
+
+          td.textContent =
+            valeur === null || valeur === undefined
+              ? ''
+              : valeur;
+
+          tr.appendChild(td);
+        });
+
+        corps.appendChild(tr);
+      });
+
+
+      compteur.textContent =
+        donnees.length +
+        ' personne' +
+        (donnees.length > 1 ? 's' : '');
+
+    });
+
+  </script>
+
+</body>
+</html>
