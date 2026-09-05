@@ -72,9 +72,10 @@
     }
 
     th {
-      background: #eee;
-      color: #222;
+      background: #eeeeee;
+      color: #222222;
       font-weight: bold;
+
       position: sticky;
       top: 0;
       z-index: 2;
@@ -98,14 +99,19 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+
       width: 460px;
       max-width: calc(100% - 60px);
       max-height: calc(100vh - 80px);
+
       overflow-y: auto;
+
       background: white;
       border: 1px solid #999;
       padding: 20px;
+
       box-shadow: 0 5px 25px rgba(0,0,0,0.25);
+
       z-index: 1000;
     }
 
@@ -213,11 +219,14 @@
 
   </div>
 
+
   <div id="compteur"></div>
+
 
   <div id="message">
     Choisissez les colonnes à imprimer dans les paramètres du widget.
   </div>
+
 
   <div class="table-wrapper">
 
@@ -233,10 +242,12 @@
 
   </div>
 
+
   <div
     id="fondConfiguration"
     onclick="fermerConfiguration()">
   </div>
+
 
   <div id="configuration">
 
@@ -244,7 +255,9 @@
       Présentation du titre
     </h2>
 
+
     <div class="champ">
+
       <label for="titreInput">
         Titre du tableau
       </label>
@@ -254,24 +267,49 @@
         type="text"
         placeholder="Exemple : Liste des hospitaliers"
       >
+
     </div>
 
+
     <div class="champ">
+
       <label for="policeTitre">
         Police
       </label>
 
       <select id="policeTitre">
-        <option value="Arial, sans-serif">Arial</option>
-        <option value="Verdana, sans-serif">Verdana</option>
-        <option value="Tahoma, sans-serif">Tahoma</option>
-        <option value="Trebuchet MS, sans-serif">Trebuchet MS</option>
-        <option value="Georgia, serif">Georgia</option>
-        <option value="Times New Roman, serif">Times New Roman</option>
+
+        <option value="Arial, sans-serif">
+          Arial
+        </option>
+
+        <option value="Verdana, sans-serif">
+          Verdana
+        </option>
+
+        <option value="Tahoma, sans-serif">
+          Tahoma
+        </option>
+
+        <option value="Trebuchet MS, sans-serif">
+          Trebuchet MS
+        </option>
+
+        <option value="Georgia, serif">
+          Georgia
+        </option>
+
+        <option value="Times New Roman, serif">
+          Times New Roman
+        </option>
+
       </select>
+
     </div>
 
+
     <div class="champ">
+
       <label for="tailleTitre">
         Taille du titre
       </label>
@@ -283,7 +321,9 @@
         max="60"
         step="1"
       >
+
     </div>
+
 
     <div class="champ">
 
@@ -294,26 +334,35 @@
       <div class="ligne-options">
 
         <label class="option-cocher">
+
           <input
             id="grasTitre"
             type="checkbox"
           >
+
           Gras
+
         </label>
 
+
         <label class="option-cocher">
+
           <input
             id="italiqueTitre"
             type="checkbox"
           >
+
           Italique
+
         </label>
 
       </div>
 
     </div>
 
+
     <div class="champ">
+
       <label for="couleurTitre">
         Couleur du texte
       </label>
@@ -322,19 +371,34 @@
         id="couleurTitre"
         type="color"
       >
+
     </div>
 
+
     <div class="champ">
+
       <label for="alignementTitre">
         Alignement
       </label>
 
       <select id="alignementTitre">
-        <option value="left">Gauche</option>
-        <option value="center">Centre</option>
-        <option value="right">Droite</option>
+
+        <option value="left">
+          Gauche
+        </option>
+
+        <option value="center">
+          Centre
+        </option>
+
+        <option value="right">
+          Droite
+        </option>
+
       </select>
+
     </div>
+
 
     <div class="boutonsConfiguration">
 
@@ -350,52 +414,86 @@
 
   </div>
 
+
   <script>
 
     let labelsColonnes = {};
     let stylesColonnes = {};
 
+
     let optionsTitre = {
-      titre: 'Liste des participants',
-      police: 'Arial, sans-serif',
-      taille: 24,
-      gras: true,
-      italique: false,
-      couleur: '#222222',
-      alignement: 'left'
+
+      titre:
+        'Liste des participants',
+
+      police:
+        'Arial, sans-serif',
+
+      taille:
+        24,
+
+      gras:
+        true,
+
+      italique:
+        false,
+
+      couleur:
+        '#222222',
+
+      alignement:
+        'left'
+
     };
 
+
+
+    /* ===================================================== */
+    /* TITRE                                                 */
+    /* ===================================================== */
 
     function appliquerStyleTitre() {
 
       const titre =
-        document.getElementById('titreGeneral');
+        document.getElementById(
+          'titreGeneral'
+        );
+
 
       titre.textContent =
         optionsTitre.titre;
 
+
       titre.style.fontFamily =
         optionsTitre.police;
 
+
       titre.style.fontSize =
-        optionsTitre.taille + 'px';
+        optionsTitre.taille +
+        'px';
+
 
       titre.style.fontWeight =
         optionsTitre.gras
           ? 'bold'
           : 'normal';
 
+
       titre.style.fontStyle =
         optionsTitre.italique
           ? 'italic'
           : 'normal';
 
+
       titre.style.color =
         optionsTitre.couleur;
 
+
       titre.style.textAlign =
         optionsTitre.alignement;
+
     }
+
 
 
     function ouvrirConfiguration() {
@@ -405,46 +503,56 @@
       ).value =
         optionsTitre.titre;
 
+
       document.getElementById(
         'policeTitre'
       ).value =
         optionsTitre.police;
+
 
       document.getElementById(
         'tailleTitre'
       ).value =
         optionsTitre.taille;
 
+
       document.getElementById(
         'grasTitre'
       ).checked =
         optionsTitre.gras;
+
 
       document.getElementById(
         'italiqueTitre'
       ).checked =
         optionsTitre.italique;
 
+
       document.getElementById(
         'couleurTitre'
       ).value =
         optionsTitre.couleur;
+
 
       document.getElementById(
         'alignementTitre'
       ).value =
         optionsTitre.alignement;
 
+
       document.getElementById(
         'fondConfiguration'
       ).style.display =
         'block';
 
+
       document.getElementById(
         'configuration'
       ).style.display =
         'block';
+
     }
+
 
 
     function fermerConfiguration() {
@@ -454,11 +562,14 @@
       ).style.display =
         'none';
 
+
       document.getElementById(
         'configuration'
       ).style.display =
         'none';
+
     }
+
 
 
     async function enregistrerConfiguration() {
@@ -467,6 +578,7 @@
         document.getElementById(
           'titreInput'
         ).value.trim();
+
 
       optionsTitre = {
 
@@ -505,9 +617,12 @@
           document.getElementById(
             'alignementTitre'
           ).value
+
       };
 
+
       appliquerStyleTitre();
+
 
       try {
 
@@ -516,34 +631,63 @@
           optionsTitre
         );
 
-      } catch (erreur) {
+      }
+
+      catch (erreur) {
 
         console.error(
           'Impossible d’enregistrer les paramètres du titre :',
           erreur
         );
+
       }
 
+
       fermerConfiguration();
+
     }
 
 
+
+    /* ===================================================== */
+    /* INITIALISATION GRIST                                  */
+    /* ===================================================== */
+
     grist.ready({
 
-      requiredAccess: 'full',
+      requiredAccess:
+        'full',
 
       columns: [
+
         {
-          name: 'Colonnes',
-          title: 'Colonnes à imprimer',
-          type: 'Any',
-          optional: true,
-          allowMultiple: true
+
+          name:
+            'Colonnes',
+
+          title:
+            'Colonnes à imprimer',
+
+          type:
+            'Any',
+
+          optional:
+            true,
+
+          allowMultiple:
+            true
+
         }
+
       ]
 
     });
 
+
+
+    /* ===================================================== */
+    /* OPTIONS DU TITRE                                      */
+    /* ===================================================== */
 
     grist.onOptions(
       function(options) {
@@ -567,12 +711,20 @@
 
           optionsTitre.titre =
             options.titre;
+
         }
 
+
         appliquerStyleTitre();
+
       }
     );
 
+
+
+    /* ===================================================== */
+    /* OUTILS STYLE GRIST                                    */
+    /* ===================================================== */
 
     function convertirOptions(texte) {
 
@@ -580,115 +732,144 @@
         return {};
       }
 
-      if (typeof texte === 'object') {
+
+      if (
+        typeof texte ===
+        'object'
+      ) {
+
         return texte;
+
       }
 
+
       try {
-        return JSON.parse(texte);
+
+        return JSON.parse(
+          texte
+        );
+
       }
 
       catch (erreur) {
+
         return {};
+
       }
+
     }
+
 
 
     function trouverCouleurFond(options) {
 
       return (
+
         options.fillColor ||
+
         options.backgroundColor ||
+
         options.bgColor ||
+
         options.cellBackgroundColor ||
+
         options.headerFillColor ||
+
         options.headerBackgroundColor ||
+
         null
+
       );
+
     }
+
 
 
     function trouverCouleurTexte(options) {
 
       return (
+
         options.textColor ||
+
         options.color ||
+
         options.fontColor ||
+
         options.headerTextColor ||
+
         null
+
       );
+
     }
+
 
 
     function creerStyleDepuisOptions(options) {
 
-      const fond =
-        trouverCouleurFond(options);
-
-      const texte =
-        trouverCouleurTexte(options);
-
       return {
-        fond: fond,
-        texte: texte
+
+        fond:
+          trouverCouleurFond(
+            options
+          ),
+
+        texte:
+          trouverCouleurTexte(
+            options
+          )
+
       };
+
     }
 
 
-    async function chargerMetadonneesColonnes() {
+
+    /* ===================================================== */
+    /* METADONNEES                                           */
+    /* ===================================================== */
+
+    async function chargerMetadonnees(
+      colonnesMappees
+    ) {
 
       try {
+
+        const tables =
+          await grist.docApi.fetchTable(
+            '_grist_Tables'
+          );
+
 
         const colonnes =
           await grist.docApi.fetchTable(
             '_grist_Tables_column'
           );
 
-        labelsColonnes = {};
-        stylesColonnes = {};
-
-        for (
-          let i = 0;
-          i < colonnes.id.length;
-          i++
-        ) {
-
-          const colId =
-            colonnes.colId[i];
-
-          const label =
-            colonnes.label[i];
-
-          const widgetOptions =
-            convertirOptions(
-              colonnes.widgetOptions[i]
-            );
-
-          if (colId) {
-
-            labelsColonnes[colId] =
-              label || colId;
-
-            stylesColonnes[colId] =
-              creerStyleDepuisOptions(
-                widgetOptions
-              );
-          }
-        }
-
-
-        /*
-          On lit aussi le style de la vue,
-          car certains réglages visuels sont liés
-          à la vue et non directement à la colonne.
-        */
 
         const champsVue =
           await grist.docApi.fetchTable(
             '_grist_Views_section_field'
           );
 
-        const refsVersColId = {};
+
+        labelsColonnes = {};
+        stylesColonnes = {};
+
+
+        /*
+          ---------------------------------------------------
+          1 - Repérage des colonnes de la table source
+          ---------------------------------------------------
+        */
+
+        let tableRefSource =
+          null;
+
+
+        const refColonneParId =
+          {};
+
 
         for (
           let i = 0;
@@ -696,59 +877,266 @@
           i++
         ) {
 
-          refsVersColId[
-            colonnes.id[i]
-          ] =
+          const colId =
             colonnes.colId[i];
+
+          const colRef =
+            colonnes.id[i];
+
+
+          refColonneParId[
+            colId
+          ] =
+            colRef;
+
+
+          labelsColonnes[
+            colId
+          ] =
+            colonnes.label[i] ||
+            colId;
+
+
+          /*
+            On détermine la table source
+            grâce à une des colonnes
+            réellement sélectionnées
+            dans notre widget.
+          */
+
+          if (
+            tableRefSource === null &&
+            colonnesMappees.includes(
+              colId
+            )
+          ) {
+
+            tableRefSource =
+              colonnes.parentId[i];
+
+          }
+
         }
+
+
+
+        if (
+          tableRefSource ===
+          null
+        ) {
+
+          return;
+
+        }
+
+
+
+        /*
+          ---------------------------------------------------
+          2 - Repérage de la VUE BRUTE de cette table
+          ---------------------------------------------------
+
+          IMPORTANT :
+          On n'utilise plus toutes les vues du document.
+
+          Cela évite d'aller récupérer par erreur
+          le style de "fiche médicale".
+        */
+
+        let sectionSource =
+          null;
 
 
         for (
           let i = 0;
-          i < champsVue.id.length;
+          i < tables.id.length;
           i++
         ) {
 
-          const colRef =
-            champsVue.colRef[i];
+          if (
+            tables.id[i] ===
+            tableRefSource
+          ) {
+
+            sectionSource =
+              tables.rawViewSectionRef[i];
+
+            break;
+
+          }
+
+        }
+
+
+
+        /*
+          ---------------------------------------------------
+          3 - Styles de base des colonnes
+          ---------------------------------------------------
+        */
+
+        for (
+          let i = 0;
+          i < colonnes.id.length;
+          i++
+        ) {
+
+          if (
+            colonnes.parentId[i] !==
+            tableRefSource
+          ) {
+
+            continue;
+
+          }
+
 
           const colId =
-            refsVersColId[colRef];
+            colonnes.colId[i];
 
-          if (!colId) {
-            continue;
-          }
 
-          const optionsVue =
+          const options =
             convertirOptions(
-              champsVue.widgetOptions[i]
+              colonnes.widgetOptions[i]
             );
 
-          const styleVue =
+
+          stylesColonnes[
+            colId
+          ] =
             creerStyleDepuisOptions(
-              optionsVue
+              options
             );
 
+        }
 
-          if (!stylesColonnes[colId]) {
 
-            stylesColonnes[colId] =
-              {};
+
+        /*
+          ---------------------------------------------------
+          4 - Style UNIQUEMENT de la section source
+          ---------------------------------------------------
+
+          Si la colonne n'a aucune couleur dans
+          participant 2026 :
+          on laisse le gris par défaut.
+
+          On ne cherche PLUS une autre vue.
+        */
+
+        if (sectionSource) {
+
+          const colIdParRef =
+            {};
+
+
+          for (
+            let i = 0;
+            i < colonnes.id.length;
+            i++
+          ) {
+
+            if (
+              colonnes.parentId[i] ===
+              tableRefSource
+            ) {
+
+              colIdParRef[
+                colonnes.id[i]
+              ] =
+                colonnes.colId[i];
+
+            }
+
           }
 
 
-          if (styleVue.fond) {
 
-            stylesColonnes[colId].fond =
-              styleVue.fond;
+          for (
+            let i = 0;
+            i < champsVue.id.length;
+            i++
+          ) {
+
+            /*
+              C'est LA condition importante.
+            */
+
+            if (
+              champsVue.parentId[i] !==
+              sectionSource
+            ) {
+
+              continue;
+
+            }
+
+
+            const colRef =
+              champsVue.colRef[i];
+
+
+            const colId =
+              colIdParRef[
+                colRef
+              ];
+
+
+            if (!colId) {
+              continue;
+            }
+
+
+            const optionsVue =
+              convertirOptions(
+                champsVue.widgetOptions[i]
+              );
+
+
+            const styleVue =
+              creerStyleDepuisOptions(
+                optionsVue
+              );
+
+
+            if (
+              !stylesColonnes[
+                colId
+              ]
+            ) {
+
+              stylesColonnes[
+                colId
+              ] = {};
+
+            }
+
+
+            if (
+              styleVue.fond
+            ) {
+
+              stylesColonnes[
+                colId
+              ].fond =
+                styleVue.fond;
+
+            }
+
+
+            if (
+              styleVue.texte
+            ) {
+
+              stylesColonnes[
+                colId
+              ].texte =
+                styleVue.texte;
+
+            }
+
           }
 
-
-          if (styleVue.texte) {
-
-            stylesColonnes[colId].texte =
-              styleVue.texte;
-          }
         }
 
       }
@@ -756,17 +1144,47 @@
       catch (erreur) {
 
         console.error(
-          'Impossible de récupérer les métadonnées des colonnes :',
+          'Impossible de récupérer les styles Grist :',
           erreur
         );
+
       }
+
     }
 
 
-    grist.onRecords(
-      async function(records, mappings) {
 
-        await chargerMetadonneesColonnes();
+    /* ===================================================== */
+    /* DONNEES                                               */
+    /* ===================================================== */
+
+    grist.onRecords(
+      async function(
+        records,
+        mappings
+      ) {
+
+
+        const colonnesMappees =
+
+          mappings &&
+
+          mappings.Colonnes &&
+
+          Array.isArray(
+            mappings.Colonnes
+          )
+
+            ? mappings.Colonnes
+
+            : [];
+
+
+
+        await chargerMetadonnees(
+          colonnesMappees
+        );
+
 
 
         const tableau =
@@ -774,20 +1192,24 @@
             'tableau'
           );
 
+
         const entetes =
           document.getElementById(
             'entetes'
           );
+
 
         const corps =
           document.getElementById(
             'corps'
           );
 
+
         const compteur =
           document.getElementById(
             'compteur'
           );
+
 
         const message =
           document.getElementById(
@@ -795,11 +1217,18 @@
           );
 
 
-        entetes.innerHTML = '';
-        corps.innerHTML = '';
+
+        entetes.innerHTML =
+          '';
+
+
+        corps.innerHTML =
+          '';
+
 
 
         const donnees =
+
           records
             .map(
               record =>
@@ -807,50 +1236,59 @@
                   record
                 )
             )
-            .filter(Boolean);
+            .filter(
+              Boolean
+            );
+
 
 
         if (
+
           donnees.length === 0 ||
+
           !donnees[0].Colonnes ||
+
           !Array.isArray(
             donnees[0].Colonnes
           )
+
         ) {
 
           tableau.style.display =
             'none';
 
+
           message.style.display =
             'block';
+
 
           compteur.textContent =
             '';
 
+
           return;
+
         }
+
 
 
         message.style.display =
           'none';
 
+
         tableau.style.display =
           'table';
+
 
 
         const nombreColonnes =
           donnees[0].Colonnes.length;
 
 
-        const colonnesMappees =
-          mappings &&
-          mappings.Colonnes &&
-          Array.isArray(
-            mappings.Colonnes
-          )
-            ? mappings.Colonnes
-            : [];
 
+        /* ================================================= */
+        /* ENTETES                                           */
+        /* ================================================= */
 
         for (
           let i = 0;
@@ -863,8 +1301,11 @@
               'th'
             );
 
+
           const colId =
+
             colonnesMappees[i] ||
+
             (
               'Colonne ' +
               (i + 1)
@@ -872,80 +1313,143 @@
 
 
           th.textContent =
-            labelsColonnes[colId] ||
+
+            labelsColonnes[
+              colId
+            ] ||
+
             colId;
 
 
+
+          /*
+            Valeurs PAR DÉFAUT.
+
+            Donc si participant 2026
+            n'a pas de couleur :
+            on reste gris.
+
+            Jamais une couleur d'une autre vue.
+          */
+
+          th.style.backgroundColor =
+            '#eeeeee';
+
+
+          th.style.color =
+            '#222222';
+
+
+
           const style =
-            stylesColonnes[colId] ||
+            stylesColonnes[
+              colId
+            ] ||
             {};
 
 
-          if (style.fond) {
+
+          if (
+            style.fond
+          ) {
 
             th.style.backgroundColor =
               style.fond;
+
           }
 
 
-          if (style.texte) {
+
+          if (
+            style.texte
+          ) {
 
             th.style.color =
               style.texte;
+
           }
+
 
 
           entetes.appendChild(
             th
           );
+
         }
 
 
+
+        /* ================================================= */
+        /* LIGNES                                            */
+        /* ================================================= */
+
         donnees.forEach(
           ligne => {
+
 
             const tr =
               document.createElement(
                 'tr'
               );
 
+
             ligne.Colonnes.forEach(
               valeur => {
+
 
                 const td =
                   document.createElement(
                     'td'
                   );
 
+
                 td.textContent =
+
                   valeur === null ||
+
                   valeur === undefined
+
                     ? ''
+
                     : valeur;
+
 
                 tr.appendChild(
                   td
                 );
+
               }
             );
+
 
             corps.appendChild(
               tr
             );
+
           }
         );
 
 
+
+        /* ================================================= */
+        /* COMPTEUR                                          */
+        /* ================================================= */
+
         compteur.textContent =
+
           donnees.length +
+
           ' ligne' +
+
           (
             donnees.length > 1
               ? 's'
               : ''
           );
+
       }
     );
+
 
 
     appliquerStyleTitre();
