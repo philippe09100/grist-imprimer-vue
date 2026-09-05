@@ -9,6 +9,7 @@
   <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
 
   <style>
+
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
@@ -67,6 +68,7 @@
     th {
       background: #eee;
       font-weight: bold;
+
       position: sticky;
       top: 0;
       z-index: 2;
@@ -76,13 +78,76 @@
       break-inside: avoid;
     }
 
+
+    /* ------------------------------ */
+    /* FENETRE DE CONFIGURATION TITRE */
+    /* ------------------------------ */
+
+    #configuration {
+      display: none;
+
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+
+      width: 420px;
+      max-width: calc(100% - 40px);
+
+      background: white;
+      border: 1px solid #999;
+      padding: 20px;
+
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+
+      z-index: 1000;
+    }
+
+    #configuration h2 {
+      margin-top: 0;
+      font-size: 20px;
+    }
+
+    #configuration label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    #titreInput {
+      box-sizing: border-box;
+      width: 100%;
+
+      padding: 8px;
+
+      font-size: 15px;
+
+      margin-bottom: 15px;
+    }
+
+    .boutonsConfiguration {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+
+    /* ------------------------------ */
+    /* IMPRESSION                     */
+    /* ------------------------------ */
+
     @media print {
+
       body {
         margin: 0;
       }
 
       button {
         display: none;
+      }
+
+      #configuration {
+        display: none !important;
       }
 
       .table-wrapper {
@@ -97,189 +162,518 @@
       th {
         position: static;
       }
+
     }
+
   </style>
 </head>
 
+
 <body>
 
+
   <div class="haut">
-    <h1>Liste des participants</h1>
-    <button onclick="window.print()">Imprimer</button>
+
+    <h1 id="titreGeneral">
+      Liste des participants
+    </h1>
+
+    <button onclick="window.print()">
+      Imprimer
+    </button>
+
   </div>
 
+
   <div id="compteur"></div>
+
 
   <div id="message">
     Choisissez les colonnes à imprimer dans les paramètres du widget.
   </div>
 
+
   <div class="table-wrapper">
+
     <table id="tableau" style="display:none;">
+
       <thead>
         <tr id="entetes"></tr>
       </thead>
 
       <tbody id="corps"></tbody>
+
     </table>
+
   </div>
+
+
+
+  <!-- CONFIGURATION DU TITRE -->
+
+  <div id="configuration">
+
+    <h2>
+      Configuration du tableau
+    </h2>
+
+    <label for="titreInput">
+      Titre du tableau
+    </label>
+
+    <input
+      id="titreInput"
+      type="text"
+      placeholder="Exemple : Liste des hospitaliers"
+    >
+
+
+    <div class="boutonsConfiguration">
+
+      <button onclick="fermerConfiguration()">
+        Annuler
+      </button>
+
+      <button onclick="enregistrerConfiguration()">
+        Enregistrer
+      </button>
+
+    </div>
+
+  </div>
+
+
 
   <script>
 
+    /* ===================================== */
+    /* VARIABLES                             */
+    /* ===================================== */
+
     let labelsColonnes = {};
 
+    let titreActuel = 'Liste des participants';
+
+
+
+    /* ===================================== */
+    /* CONFIGURATION DU TITRE                */
+    /* ===================================== */
+
+    function ouvrirConfiguration() {
+
+      const configuration =
+        document.getElementById('configuration');
+
+      const titreInput =
+        document.getElementById('titreInput');
+
+
+      titreInput.value = titreActuel;
+
+      configuration.style.display = 'block';
+
+      titreInput.focus();
+
+    }
+
+
+
+    function fermerConfiguration() {
+
+      document.getElementById(
+        'configuration'
+      ).style.display = 'none';
+
+    }
+
+
+
+    async function enregistrerConfiguration() {
+
+      const titreInput =
+        document.getElementById('titreInput');
+
+
+      let nouveauTitre =
+        titreInput.value.trim();
+
+
+      if (!nouveauTitre) {
+
+        nouveauTitre =
+          'Liste des participants';
+
+      }
+
+
+      await grist.setOption(
+        'titre',
+        nouveauTitre
+      );
+
+
+      fermerConfiguration();
+
+    }
+
+
+
+    /* ===================================== */
+    /* INITIALISATION GRIST                  */
+    /* ===================================== */
+
     grist.ready({
+
       requiredAccess: 'full',
 
       columns: [
+
         {
+
           name: 'Colonnes',
+
           title: 'Colonnes à imprimer',
+
           type: 'Any',
+
           optional: true,
+
           allowMultiple: true
+
         }
-      ]
+
+      ],
+
+
+      onEditOptions: function() {
+
+        ouvrirConfiguration();
+
+      }
+
     });
 
+
+
+    /* ===================================== */
+    /* OPTIONS DU WIDGET                     */
+    /* ===================================== */
+
+    grist.onOptions(function(options) {
+
+      if (
+        options &&
+        options.titre
+      ) {
+
+        titreActuel =
+          options.titre;
+
+      } else {
+
+        titreActuel =
+          'Liste des participants';
+
+      }
+
+
+      document.getElementById(
+        'titreGeneral'
+      ).textContent =
+        titreActuel;
+
+    });
+
+
+
+    /* ===================================== */
+    /* LIBELLES DES COLONNES GRIST           */
+    /* ===================================== */
 
     async function chargerLabelsColonnes() {
 
       try {
 
         const meta =
-          await grist.docApi.fetchTable('_grist_Tables_column');
+          await grist.docApi.fetchTable(
+            '_grist_Tables_column'
+          );
+
 
         labelsColonnes = {};
 
-        for (let i = 0; i < meta.id.length; i++) {
 
-          const colId = meta.colId[i];
-          const label = meta.label[i];
+        for (
+          let i = 0;
+          i < meta.id.length;
+          i++
+        ) {
+
+          const colId =
+            meta.colId[i];
+
+          const label =
+            meta.label[i];
+
 
           if (colId) {
-            labelsColonnes[colId] = label || colId;
+
+            labelsColonnes[colId] =
+              label || colId;
+
           }
+
         }
 
-      } catch (erreur) {
+      }
+
+      catch (erreur) {
 
         console.error(
           'Impossible de récupérer les libellés :',
           erreur
         );
+
       }
+
     }
 
 
-    grist.onRecords(async function(records, mappings) {
 
-      await chargerLabelsColonnes();
+    /* ===================================== */
+    /* RECEPTION DES DONNEES GRIST           */
+    /* ===================================== */
 
-      const tableau =
-        document.getElementById('tableau');
-
-      const entetes =
-        document.getElementById('entetes');
-
-      const corps =
-        document.getElementById('corps');
-
-      const compteur =
-        document.getElementById('compteur');
-
-      const message =
-        document.getElementById('message');
+    grist.onRecords(
+      async function(records, mappings) {
 
 
-      entetes.innerHTML = '';
-      corps.innerHTML = '';
+        await chargerLabelsColonnes();
 
 
-      const donnees = records
-        .map(record => grist.mapColumnNames(record))
-        .filter(Boolean);
+        const tableau =
+          document.getElementById(
+            'tableau'
+          );
+
+        const entetes =
+          document.getElementById(
+            'entetes'
+          );
+
+        const corps =
+          document.getElementById(
+            'corps'
+          );
+
+        const compteur =
+          document.getElementById(
+            'compteur'
+          );
+
+        const message =
+          document.getElementById(
+            'message'
+          );
 
 
-      if (
-        donnees.length === 0 ||
-        !donnees[0].Colonnes ||
-        !Array.isArray(donnees[0].Colonnes)
-      ) {
+        entetes.innerHTML = '';
 
-        tableau.style.display = 'none';
-        message.style.display = 'block';
-        compteur.textContent = '';
+        corps.innerHTML = '';
 
-        return;
+
+
+        /* ------------------------------- */
+        /* DONNEES                         */
+        /* ------------------------------- */
+
+        const donnees =
+          records
+            .map(
+              record =>
+                grist.mapColumnNames(
+                  record
+                )
+            )
+            .filter(Boolean);
+
+
+
+        /* ------------------------------- */
+        /* AUCUNE COLONNE SELECTIONNEE     */
+        /* ------------------------------- */
+
+        if (
+
+          donnees.length === 0 ||
+
+          !donnees[0].Colonnes ||
+
+          !Array.isArray(
+            donnees[0].Colonnes
+          )
+
+        ) {
+
+          tableau.style.display =
+            'none';
+
+          message.style.display =
+            'block';
+
+          compteur.textContent =
+            '';
+
+          return;
+
+        }
+
+
+
+        message.style.display =
+          'none';
+
+        tableau.style.display =
+          'table';
+
+
+
+        /* ------------------------------- */
+        /* COLONNES                        */
+        /* ------------------------------- */
+
+        const nombreColonnes =
+          donnees[0].Colonnes.length;
+
+
+        const colonnesMappees =
+
+          mappings &&
+
+          mappings.Colonnes &&
+
+          Array.isArray(
+            mappings.Colonnes
+          )
+
+            ? mappings.Colonnes
+
+            : [];
+
+
+
+        /* ------------------------------- */
+        /* ENTETES                         */
+        /* ------------------------------- */
+
+        for (
+          let i = 0;
+          i < nombreColonnes;
+          i++
+        ) {
+
+          const th =
+            document.createElement(
+              'th'
+            );
+
+
+          const colId =
+
+            colonnesMappees[i] ||
+
+            (
+              'Colonne ' +
+              (i + 1)
+            );
+
+
+          th.textContent =
+
+            labelsColonnes[colId] ||
+
+            colId;
+
+
+          entetes.appendChild(
+            th
+          );
+
+        }
+
+
+
+        /* ------------------------------- */
+        /* LIGNES DU TABLEAU               */
+        /* ------------------------------- */
+
+        donnees.forEach(
+          ligne => {
+
+
+            const tr =
+              document.createElement(
+                'tr'
+              );
+
+
+            ligne.Colonnes.forEach(
+              valeur => {
+
+
+                const td =
+                  document.createElement(
+                    'td'
+                  );
+
+
+                td.textContent =
+
+                  valeur === null ||
+
+                  valeur === undefined
+
+                    ? ''
+
+                    : valeur;
+
+
+                tr.appendChild(
+                  td
+                );
+
+              }
+            );
+
+
+            corps.appendChild(
+              tr
+            );
+
+          }
+        );
+
+
+
+        /* ------------------------------- */
+        /* COMPTEUR                        */
+        /* ------------------------------- */
+
+        compteur.textContent =
+
+          donnees.length +
+
+          ' ligne' +
+
+          (
+            donnees.length > 1
+              ? 's'
+              : ''
+          );
+
       }
-
-
-      message.style.display = 'none';
-      tableau.style.display = 'table';
-
-
-      const nombreColonnes =
-        donnees[0].Colonnes.length;
-
-
-      const colonnesMappees =
-        mappings &&
-        mappings.Colonnes &&
-        Array.isArray(mappings.Colonnes)
-          ? mappings.Colonnes
-          : [];
-
-
-      for (
-        let i = 0;
-        i < nombreColonnes;
-        i++
-      ) {
-
-        const th =
-          document.createElement('th');
-
-        const colId =
-          colonnesMappees[i] ||
-          ('Colonne ' + (i + 1));
-
-        th.textContent =
-          labelsColonnes[colId] || colId;
-
-        entetes.appendChild(th);
-      }
-
-
-      donnees.forEach(ligne => {
-
-        const tr =
-          document.createElement('tr');
-
-        ligne.Colonnes.forEach(valeur => {
-
-          const td =
-            document.createElement('td');
-
-          td.textContent =
-            valeur === null ||
-            valeur === undefined
-              ? ''
-              : valeur;
-
-          tr.appendChild(td);
-        });
-
-        corps.appendChild(tr);
-      });
-
-
-      compteur.textContent =
-        donnees.length +
-        ' ligne' +
-        (donnees.length > 1 ? 's' : '');
-
-    });
+    );
 
   </script>
 
