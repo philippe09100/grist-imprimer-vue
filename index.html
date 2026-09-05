@@ -73,6 +73,7 @@
 
     th {
       background: #eee;
+      color: #222;
       font-weight: bold;
       position: sticky;
       top: 0;
@@ -352,6 +353,7 @@
   <script>
 
     let labelsColonnes = {};
+    let stylesColonnes = {};
 
     let optionsTitre = {
       titre: 'Liste des participants',
@@ -433,7 +435,6 @@
       ).value =
         optionsTitre.alignement;
 
-
       document.getElementById(
         'fondConfiguration'
       ).style.display =
@@ -506,9 +507,7 @@
           ).value
       };
 
-
       appliquerStyleTitre();
-
 
       try {
 
@@ -524,7 +523,6 @@
           erreur
         );
       }
-
 
       fermerConfiguration();
     }
@@ -576,40 +574,189 @@
     );
 
 
-    async function chargerLabelsColonnes() {
+    function convertirOptions(texte) {
+
+      if (!texte) {
+        return {};
+      }
+
+      if (typeof texte === 'object') {
+        return texte;
+      }
+
+      try {
+        return JSON.parse(texte);
+      }
+
+      catch (erreur) {
+        return {};
+      }
+    }
+
+
+    function trouverCouleurFond(options) {
+
+      return (
+        options.fillColor ||
+        options.backgroundColor ||
+        options.bgColor ||
+        options.cellBackgroundColor ||
+        options.headerFillColor ||
+        options.headerBackgroundColor ||
+        null
+      );
+    }
+
+
+    function trouverCouleurTexte(options) {
+
+      return (
+        options.textColor ||
+        options.color ||
+        options.fontColor ||
+        options.headerTextColor ||
+        null
+      );
+    }
+
+
+    function creerStyleDepuisOptions(options) {
+
+      const fond =
+        trouverCouleurFond(options);
+
+      const texte =
+        trouverCouleurTexte(options);
+
+      return {
+        fond: fond,
+        texte: texte
+      };
+    }
+
+
+    async function chargerMetadonneesColonnes() {
 
       try {
 
-        const meta =
+        const colonnes =
           await grist.docApi.fetchTable(
             '_grist_Tables_column'
           );
 
         labelsColonnes = {};
+        stylesColonnes = {};
 
         for (
           let i = 0;
-          i < meta.id.length;
+          i < colonnes.id.length;
           i++
         ) {
 
           const colId =
-            meta.colId[i];
+            colonnes.colId[i];
 
           const label =
-            meta.label[i];
+            colonnes.label[i];
+
+          const widgetOptions =
+            convertirOptions(
+              colonnes.widgetOptions[i]
+            );
 
           if (colId) {
 
             labelsColonnes[colId] =
               label || colId;
+
+            stylesColonnes[colId] =
+              creerStyleDepuisOptions(
+                widgetOptions
+              );
           }
         }
 
-      } catch (erreur) {
+
+        /*
+          On lit aussi le style de la vue,
+          car certains réglages visuels sont liés
+          à la vue et non directement à la colonne.
+        */
+
+        const champsVue =
+          await grist.docApi.fetchTable(
+            '_grist_Views_section_field'
+          );
+
+        const refsVersColId = {};
+
+        for (
+          let i = 0;
+          i < colonnes.id.length;
+          i++
+        ) {
+
+          refsVersColId[
+            colonnes.id[i]
+          ] =
+            colonnes.colId[i];
+        }
+
+
+        for (
+          let i = 0;
+          i < champsVue.id.length;
+          i++
+        ) {
+
+          const colRef =
+            champsVue.colRef[i];
+
+          const colId =
+            refsVersColId[colRef];
+
+          if (!colId) {
+            continue;
+          }
+
+          const optionsVue =
+            convertirOptions(
+              champsVue.widgetOptions[i]
+            );
+
+          const styleVue =
+            creerStyleDepuisOptions(
+              optionsVue
+            );
+
+
+          if (!stylesColonnes[colId]) {
+
+            stylesColonnes[colId] =
+              {};
+          }
+
+
+          if (styleVue.fond) {
+
+            stylesColonnes[colId].fond =
+              styleVue.fond;
+          }
+
+
+          if (styleVue.texte) {
+
+            stylesColonnes[colId].texte =
+              styleVue.texte;
+          }
+        }
+
+      }
+
+      catch (erreur) {
 
         console.error(
-          'Impossible de récupérer les libellés :',
+          'Impossible de récupérer les métadonnées des colonnes :',
           erreur
         );
       }
@@ -619,7 +766,7 @@
     grist.onRecords(
       async function(records, mappings) {
 
-        await chargerLabelsColonnes();
+        await chargerMetadonneesColonnes();
 
 
         const tableau =
@@ -723,9 +870,30 @@
               (i + 1)
             );
 
+
           th.textContent =
             labelsColonnes[colId] ||
             colId;
+
+
+          const style =
+            stylesColonnes[colId] ||
+            {};
+
+
+          if (style.fond) {
+
+            th.style.backgroundColor =
+              style.fond;
+          }
+
+
+          if (style.texte) {
+
+            th.style.color =
+              style.texte;
+          }
+
 
           entetes.appendChild(
             th
