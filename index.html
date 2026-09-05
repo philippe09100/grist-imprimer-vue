@@ -86,6 +86,7 @@
       }
 
       .table-wrapper {
+        max-height: none;
         overflow: visible;
       }
 
@@ -146,7 +147,8 @@
 
       try {
 
-        const meta = await grist.docApi.fetchTable('_grist_Tables_column');
+        const meta =
+          await grist.docApi.fetchTable('_grist_Tables_column');
 
         labelsColonnes = {};
 
@@ -163,38 +165,36 @@
       } catch (erreur) {
 
         console.error(
-          'Impossible de récupérer les libellés des colonnes :',
+          'Impossible de récupérer les libellés :',
           erreur
         );
       }
     }
 
 
-    const colonnesMeta = await grist.docApi.fetchTable('_grist_Tables_column');
-
-const resultat = colonnesMeta.id.map((id, i) => ({
-  id: id,
-  colId: colonnesMeta.colId[i],
-  label: colonnesMeta.label[i],
-  parentId: colonnesMeta.parentId[i]
-}));
-
-document.getElementById('debug').textContent =
-  JSON.stringify(resultat, null, 2);
-
-
     grist.onRecords(async function(records, mappings) {
 
       await chargerLabelsColonnes();
 
-      const tableau = document.getElementById('tableau');
-      const entetes = document.getElementById('entetes');
-      const corps = document.getElementById('corps');
-      const compteur = document.getElementById('compteur');
-      const message = document.getElementById('message');
+      const tableau =
+        document.getElementById('tableau');
+
+      const entetes =
+        document.getElementById('entetes');
+
+      const corps =
+        document.getElementById('corps');
+
+      const compteur =
+        document.getElementById('compteur');
+
+      const message =
+        document.getElementById('message');
+
 
       entetes.innerHTML = '';
       corps.innerHTML = '';
+
 
       const donnees = records
         .map(record => grist.mapColumnNames(record))
@@ -219,7 +219,9 @@ document.getElementById('debug').textContent =
       tableau.style.display = 'table';
 
 
-      const nombreColonnes = donnees[0].Colonnes.length;
+      const nombreColonnes =
+        donnees[0].Colonnes.length;
+
 
       const colonnesMappees =
         mappings &&
@@ -229,12 +231,18 @@ document.getElementById('debug').textContent =
           : [];
 
 
-      for (let i = 0; i < nombreColonnes; i++) {
+      for (
+        let i = 0;
+        i < nombreColonnes;
+        i++
+      ) {
 
-        const th = document.createElement('th');
+        const th =
+          document.createElement('th');
 
         const colId =
-          colonnesMappees[i] || ('Colonne ' + (i + 1));
+          colonnesMappees[i] ||
+          ('Colonne ' + (i + 1));
 
         th.textContent =
           labelsColonnes[colId] || colId;
@@ -245,14 +253,17 @@ document.getElementById('debug').textContent =
 
       donnees.forEach(ligne => {
 
-        const tr = document.createElement('tr');
+        const tr =
+          document.createElement('tr');
 
         ligne.Colonnes.forEach(valeur => {
 
-          const td = document.createElement('td');
+          const td =
+            document.createElement('td');
 
           td.textContent =
-            valeur === null || valeur === undefined
+            valeur === null ||
+            valeur === undefined
               ? ''
               : valeur;
 
